@@ -8,6 +8,9 @@ defmodule TrainWhistle.User do
     field :phone, :string
     field :password, :string, virtual: true
 
+    # Associations
+    has_many :alarms, TrainWhistle.Alarm
+
     timestamps()
   end
 
