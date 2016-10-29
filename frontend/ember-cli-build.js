@@ -4,21 +4,43 @@ var EmberApp = require('ember-cli/lib/broccoli/ember-app');
 
 module.exports = function(defaults) {
   var app = new EmberApp(defaults, {
-    // Add options here
+    styleProcessorOptions: {
+      processors: [
+        {
+            type: 'node-sass',
+            sourcemaps: true,  // enables sourcemaps
+            options: {}
+        },
+        {
+          type: 'postcss',
+          plugins: [
+            {
+              module: require('autoprefixer'),
+              options: {
+                browsers: [
+                  'last 2 versions'
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      extension: 'scss'
+    },
+    intlTelInput: {
+      includeUtilsScript: true
+    }
   });
 
-  // Use `app.import` to add additional libraries to the generated
-  // output files.
-  //
-  // If you need to use different assets in different
-  // environments, specify an object as the first parameter. That
-  // object's keys should be the environment name and the values
-  // should be the asset to use in that environment.
-  //
-  // If the library that you are including contains AMD or ES6
-  // modules that you would like to import into your application
-  // please specify an object with the list of modules as keys
-  // along with the exports of each module as its value.
+  // Polyfill for closest in JS
+  app.import('bower_components/closest/closest.js');
+
+  // Date input shim
+  app.import('bower_components/better-dom/dist/better-dom.js');
+  app.import('bower_components/better-i18n-plugin/dist/better-i18n-plugin.js');
+  app.import('bower_components/better-time-element/dist/better-time-element.js');
+  app.import('bower_components/better-emmet-plugin/dist/better-emmet-plugin.js');
+  app.import('bower_components/better-dateinput-polyfill/dist/better-dateinput-polyfill.js');
 
   return app.toTree();
 };
