@@ -17,3 +17,8 @@ config :train_whistle, TrainWhistle.Repo,
   database: "train_whistle_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :guardian, Guardian,
+  secret_key: "somuchverysecretkeywow"
+
+import_config "test.secret.exs"
