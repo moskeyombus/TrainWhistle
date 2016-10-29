@@ -6,7 +6,7 @@ defmodule TrainWhistle.Alarm do
     field :end_time, Ecto.Time
     field :travel_time, :integer
     field :last_notified, Ecto.DateTime
-    belongs_to :start_location, TrainWhistle.StartLocation
+    belongs_to :start_location, TrainWhistle.Location
 
     timestamps()
   end
