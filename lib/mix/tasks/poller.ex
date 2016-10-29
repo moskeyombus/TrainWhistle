@@ -26,7 +26,8 @@ defmodule Mix.Tasks.TrainWhistle.Poller do
     now = Timex.Duration.from_time(Time.from_erl!(t))
     start_diff = abs(Timex.Duration.diff(alarm.start_time, now, :seconds))
     end_diff = abs(Timex.Duration.diff(alarm.end_time, now, :seconds))
-    match = Enum.find(arrivals, fn a -> a["station"] == alarm.name and a["direction"] == alarm.direction and alarm.line == a["line"] and start_diff <= a["waiting_seconds"] and a["waiting_seconds"] < end_diff end)
+    station_name = Alarm.station_name(alarm)
+    match = Enum.find(arrivals, fn a -> a["station"] == station_name and a["direction"] == alarm.direction and alarm.line == a["line"] and start_diff <= a["waiting_seconds"] and a["waiting_seconds"] < end_diff end)
     notify(alarm, match)
   end
 
@@ -37,6 +38,6 @@ defmodule Mix.Tasks.TrainWhistle.Poller do
     Repo.update!(changeset)
 
     hdir = Alarm.human_direction(alarm)
-    TrainWhistle.Twilio.send_message(alarm.user.phone, "time to leave for #{hdir}bound #{alarm.line} at #{alarm.name}")
+    TrainWhistle.Twilio.send_message(alarm.user.phone, "time to leave for #{hdir}bound #{alarm.line} train at #{Alarm.station_name(alarm)}")
   end
 end

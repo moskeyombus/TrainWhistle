@@ -27,6 +27,14 @@ defmodule TrainWhistle.Alarm do
     end
   end
 
+  # need to preload start_location...
+  def station_name(alarm) do
+    case alarm.start_location do
+      nil -> "(unknown)"
+      _ -> alarm.startLocation.name
+    end
+  end
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
