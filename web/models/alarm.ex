@@ -1,13 +1,18 @@
 defmodule TrainWhistle.Alarm do
   use TrainWhistle.Web, :model
 
-  schema "alarm" do
+  schema "alarms" do
     field :start_time, Ecto.Time
     field :end_time, Ecto.Time
     field :travel_time, :integer
     field :last_notified, Ecto.DateTime
     field :name, :string
+    field :direction, :string
+    field :line, :string
+
+    # Associations
     belongs_to :start_location, TrainWhistle.Location
+    belongs_to :user, TrainWhistle.User
 
     timestamps()
   end
@@ -17,7 +22,7 @@ defmodule TrainWhistle.Alarm do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:start_time, :end_time, :travel_time, :last_notified, :name])
-    |> validate_required([:start_time, :end_time, :travel_time, :last_notified, :name])
+    |> cast(params, [:start_time, :end_time, :travel_time, :last_notified, :name, :direction, :line])
+    |> validate_required([:start_time, :end_time, :travel_time, :last_notified, :name, :direction, :line])
   end
 end
