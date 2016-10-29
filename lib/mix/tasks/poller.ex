@@ -11,16 +11,20 @@ defmodule Mix.Tasks.TrainWhistle.Poller do
       preload: [:user, :start_location]
     )
     arrivals = TrainWhistle.Arrivals.parsed_arrivals
-    Enum.each(alarms, fn alarm -> check_alarm(alarm, arrivals) end)
+    alarms
+    |> Enum.map(fn alarm -> Task.async(fn -> check_alarm(alarm, arrivals) end) end)
+    |> Enum.each(&Task.await/1)
   end
 
   def check_alarm(alarm, arrivals) do
     # find first matching arrival
     # TODO: name should be station name? go go go
-    {d, t} = :calendar.local_time
+    # TODO: time zones accurate? prob not
+    {d, t} = :calendar.universal_time
     now = Timex.Duration.from_time(Time.from_erl!(t))
-    diff = Timex.Duration.diff(alarm.end_time, now, :seconds)
-    match = Enum.find(arrivals, fn a -> a["station"] == alarm.name and a["direction"] == alarm.direction and alarm.line == a["line"] and a["waiting_seconds"] > 0 and a["waiting_seconds"] < diff end)
+    start_diff = abs(Timex.Duration.diff(alarm.start_time, now, :seconds))
+    end_diff = abs(Timex.Duration.diff(alarm.end_time, now, :seconds))
+    match = Enum.find(arrivals, fn a -> a["station"] == alarm.name and a["direction"] == alarm.direction and alarm.line == a["line"] and start_diff <= a["waiting_seconds"] and a["waiting_seconds"] < end_diff end)
     notify(alarm, match)
   end
 
