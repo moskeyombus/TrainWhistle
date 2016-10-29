@@ -18,6 +18,15 @@ defmodule TrainWhistle.Alarm do
     timestamps()
   end
 
+  def human_direction(alarm) do
+    case alarm.direction do
+      "s" -> "south"
+      "n" -> "north"
+      "e" -> "east"
+      "w" -> "west"
+    end
+  end
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

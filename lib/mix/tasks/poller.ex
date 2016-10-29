@@ -34,7 +34,7 @@ defmodule Mix.Tasks.TrainWhistle.Poller do
     changeset = Alarm.changeset(alarm, %{last_notified: DateTime.utc_now})
     Repo.update!(changeset)
 
-    # TODO: SMS instead of puts
-    IO.puts alarm.id
+    hdir = Alarm.human_direction(alarm)
+    TrainWhistle.Twilio.send_message(alarm.user.phone, "time to leave for #{hdir}bound #{alarm.line} at #{alarm.name}")
   end
 end
