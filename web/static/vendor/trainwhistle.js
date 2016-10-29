@@ -6,6 +6,12 @@
 
 /* jshint ignore:end */
 
+define('trainwhistle/adapters/application', ['exports', 'ember-data', 'ember-simple-auth/mixins/data-adapter-mixin'], function (exports, _emberData, _emberSimpleAuthMixinsDataAdapterMixin) {
+  exports['default'] = _emberData['default'].JSONAPIAdapter.extend(_emberSimpleAuthMixinsDataAdapterMixin['default'], {
+    host: '/api',
+    authorizer: 'authorizer:oauth2'
+  });
+});
 define('trainwhistle/app', ['exports', 'ember', 'trainwhistle/resolver', 'ember-load-initializers', 'trainwhistle/config/environment'], function (exports, _ember, _trainwhistleResolver, _emberLoadInitializers, _trainwhistleConfigEnvironment) {
 
   var App = undefined;
@@ -18,9 +24,21 @@ define('trainwhistle/app', ['exports', 'ember', 'trainwhistle/resolver', 'ember-
     Resolver: _trainwhistleResolver['default']
   });
 
+  _ember['default'].TextSupport.reopen({
+    attributeBindings: ["autocapitalize"]
+  });
+
   (0, _emberLoadInitializers['default'])(App, _trainwhistleConfigEnvironment['default'].modulePrefix);
 
   exports['default'] = App;
+});
+define('trainwhistle/authenticators/oauth2', ['exports', 'ember-simple-auth/authenticators/oauth2-password-grant', 'ember'], function (exports, _emberSimpleAuthAuthenticatorsOauth2PasswordGrant, _ember) {
+  exports['default'] = _emberSimpleAuthAuthenticatorsOauth2PasswordGrant['default'].extend({
+    serverTokenEndpoint: '/api/login'
+  });
+});
+define('trainwhistle/authorizers/oauth2', ['exports', 'ember-simple-auth/authorizers/oauth2-bearer'], function (exports, _emberSimpleAuthAuthorizersOauth2Bearer) {
+  exports['default'] = _emberSimpleAuthAuthorizersOauth2Bearer['default'].extend();
 });
 define('trainwhistle/components/app-version', ['exports', 'ember-cli-app-version/components/app-version', 'trainwhistle/config/environment'], function (exports, _emberCliAppVersionComponentsAppVersion, _trainwhistleConfigEnvironment) {
 
@@ -83,6 +101,11 @@ define('trainwhistle/components/intl-tel-input', ['exports', 'ember-intl-tel-inp
     get: function get() {
       return _emberIntlTelInputComponentsIntlTelInput['default'];
     }
+  });
+});
+define('trainwhistle/components/missing-field', ['exports', 'ember'], function (exports, _ember) {
+  exports['default'] = _ember['default'].Component.extend({
+    classNames: ['missing']
   });
 });
 define('trainwhistle/components/notification-container', ['exports', 'ember-cli-notifications/components/notification-container'], function (exports, _emberCliNotificationsComponentsNotificationContainer) {
@@ -176,12 +199,105 @@ define('trainwhistle/components/power-select/trigger', ['exports', 'ember-power-
     }
   });
 });
-define('trainwhistle/controllers/application', ['exports', 'ember-power-select-with-fallback/controllers/application'], function (exports, _emberPowerSelectWithFallbackControllersApplication) {
-  Object.defineProperty(exports, 'default', {
-    enumerable: true,
-    get: function get() {
-      return _emberPowerSelectWithFallbackControllersApplication['default'];
+define('trainwhistle/controllers/application', ['exports', 'ember'], function (exports, _ember) {
+  exports['default'] = _ember['default'].Controller.extend({
+    session: _ember['default'].inject.service(),
+    sessionAccount: _ember['default'].inject.service(),
+
+    actions: {
+      logout: function logout() {
+        this.get('session').invalidate();
+      }
     }
+  });
+});
+define('trainwhistle/controllers/landing/log-in', ['exports', 'ember'], function (exports, _ember) {
+  exports['default'] = _ember['default'].Controller.extend({
+    session: _ember['default'].inject.service(),
+    sessionAccount: _ember['default'].inject.service(),
+    ajax: _ember['default'].inject.service(),
+
+    actions: {
+      authenticate: function authenticate() {
+        var _this = this;
+
+        this.set('errorMessage', undefined);
+
+        var _getProperties = this.getProperties('email', 'password');
+
+        var email = _getProperties.email;
+        var password = _getProperties.password;
+
+        this.get('session').authenticate('authenticator:oauth2', email, password).then(function () {
+          _this.get('sessionAccount').loadCurrentUser();
+        })['catch'](function (reason) {
+          _this.set('errorMessage', 'Invalid username or password');
+        });
+      }
+    }
+  });
+});
+define('trainwhistle/controllers/landing/sign-up', ['exports', 'ember'], function (exports, _ember) {
+  exports['default'] = _ember['default'].Controller.extend({
+    session: _ember['default'].inject.service(),
+    sessionAccount: _ember['default'].inject.service(),
+    ajax: _ember['default'].inject.service(),
+
+    actions: {
+      register: function register() {
+        var _this = this;
+
+        this.set('errorMessage', undefined);
+
+        if (this.get('password') !== this.get('passwordConfirmation')) {
+          this.set('errorMessage', 'Password and confirmation do not match.');
+          return;
+        }
+
+        var userData = {
+          first_name: this.get('firstName'),
+          last_name: this.get('lastName'),
+          email: this.get('email'),
+          password: this.get('password'),
+          phone: this.get('phone')
+        };
+
+        this.get('ajax').post('/users', { data: userData }).then(function () {
+          var _getProperties = _this.getProperties('email', 'password');
+
+          var email = _getProperties.email;
+          var password = _getProperties.password;
+
+          _this.get('session').authenticate('authenticator:oauth2', email, password).then(function () {
+            _this.get('sessionAccount').loadCurrentUser();
+          });
+        })['catch'](function () {
+          _this.set('errorMessage', 'An error occurred, please try again');
+        });
+      }
+    }
+  });
+});
+define('trainwhistle/controllers/product/profile/edit', ['exports', 'ember'], function (exports, _ember) {
+  exports['default'] = _ember['default'].Controller.extend({
+    session: _ember['default'].inject.service(),
+    sessionAccount: _ember['default'].inject.service(),
+
+    actions: {
+      update: function update() {
+        var _this = this;
+
+        sessionAccount.currentUser.save().then(function () {
+          _this.transitionToRoute('product.profile');
+        });
+      }
+    }
+  });
+});
+define('trainwhistle/controllers/product/profile/show', ['exports', 'ember'], function (exports, _ember) {
+  exports['default'] = _ember['default'].Controller.extend({
+    session: _ember['default'].inject.service(),
+    sessionAccount: _ember['default'].inject.service()
   });
 });
 define('trainwhistle/helpers/and', ['exports', 'ember', 'ember-truth-helpers/helpers/and'], function (exports, _ember, _emberTruthHelpersHelpersAnd) {
@@ -1154,6 +1270,19 @@ define('trainwhistle/initializers/ember-data', ['exports', 'ember-data/setup-con
     initialize: _emberDataSetupContainer['default']
   };
 });
+define('trainwhistle/initializers/ember-simple-auth', ['exports', 'ember', 'trainwhistle/config/environment', 'ember-simple-auth/configuration', 'ember-simple-auth/initializers/setup-session', 'ember-simple-auth/initializers/setup-session-service'], function (exports, _ember, _trainwhistleConfigEnvironment, _emberSimpleAuthConfiguration, _emberSimpleAuthInitializersSetupSession, _emberSimpleAuthInitializersSetupSessionService) {
+  exports['default'] = {
+    name: 'ember-simple-auth',
+    initialize: function initialize(registry) {
+      var config = _trainwhistleConfigEnvironment['default']['ember-simple-auth'] || {};
+      config.baseURL = _trainwhistleConfigEnvironment['default'].baseURL;
+      _emberSimpleAuthConfiguration['default'].load(config);
+
+      (0, _emberSimpleAuthInitializersSetupSession['default'])(registry);
+      (0, _emberSimpleAuthInitializersSetupSessionService['default'])(registry);
+    }
+  };
+});
 define('trainwhistle/initializers/export-application-global', ['exports', 'ember', 'trainwhistle/config/environment'], function (exports, _ember, _trainwhistleConfigEnvironment) {
   exports.initialize = initialize;
 
@@ -1320,6 +1449,50 @@ define("trainwhistle/instance-initializers/ember-data", ["exports", "ember-data/
     initialize: _emberDataPrivateInstanceInitializersInitializeStoreService["default"]
   };
 });
+define('trainwhistle/instance-initializers/ember-simple-auth', ['exports', 'ember-simple-auth/instance-initializers/setup-session-restoration'], function (exports, _emberSimpleAuthInstanceInitializersSetupSessionRestoration) {
+  exports['default'] = {
+    name: 'ember-simple-auth',
+    initialize: function initialize(instance) {
+      (0, _emberSimpleAuthInstanceInitializersSetupSessionRestoration['default'])(instance);
+    }
+  };
+});
+define('trainwhistle/models/alarm', ['exports', 'ember-data', 'ember'], function (exports, _emberData, _ember) {
+  exports['default'] = _emberData['default'].Model.extend({
+    start_time: _emberData['default'].attr('date'),
+    end_time: _emberData['default'].attr('date'),
+    last_notified: _emberData['default'].attr('date'),
+    name: _emberData['default'].attr('string'),
+    direction: _emberData['default'].attr('string'),
+    line: _emberData['default'].attr('string')
+  });
+});
+define('trainwhistle/models/user', ['exports', 'ember-data', 'ember'], function (exports, _emberData, _ember) {
+  exports['default'] = _emberData['default'].Model.extend({
+    first_name: _emberData['default'].attr('string'),
+    last_name: _emberData['default'].attr('string'),
+    phone: _emberData['default'].attr('string'),
+    email: _emberData['default'].attr('string'),
+    name: _ember['default'].computed('first_name', 'last_name', function () {
+      var firstName = this.get('first_name'),
+          lastName = this.get('last_name'),
+          name = [];
+
+      // Check for existence of first name; if it exists, add it to name array
+      if (firstName != null && firstName !== "") {
+        name.push(firstName);
+      }
+
+      // Check for existence of last name; if it exists, add it to name array
+      if (lastName != null && lastName !== "") {
+        name.push(lastName);
+      }
+
+      // Join names with spaces
+      return name.join(" ");
+    })
+  });
+});
 define('trainwhistle/resolver', ['exports', 'ember-resolver'], function (exports, _emberResolver) {
   exports['default'] = _emberResolver['default'];
 });
@@ -1352,6 +1525,14 @@ define('trainwhistle/router', ['exports', 'ember', 'trainwhistle/config/environm
 
   exports['default'] = Router;
 });
+define('trainwhistle/routes/application', ['exports', 'ember', 'ember-simple-auth/mixins/application-route-mixin'], function (exports, _ember, _emberSimpleAuthMixinsApplicationRouteMixin) {
+  exports['default'] = _ember['default'].Route.extend(_emberSimpleAuthMixinsApplicationRouteMixin['default'], {
+    sessionAccount: _ember['default'].inject.service(),
+    beforeModel: function beforeModel() {
+      this.get('sessionAccount').loadCurrentUser();
+    }
+  });
+});
 define('trainwhistle/routes/landing', ['exports', 'ember'], function (exports, _ember) {
   exports['default'] = _ember['default'].Route.extend({});
 });
@@ -1361,13 +1542,13 @@ define('trainwhistle/routes/landing/log-in', ['exports', 'ember'], function (exp
 define('trainwhistle/routes/landing/sign-up', ['exports', 'ember'], function (exports, _ember) {
   exports['default'] = _ember['default'].Route.extend({});
 });
-define('trainwhistle/routes/product', ['exports', 'ember'], function (exports, _ember) {
+define('trainwhistle/routes/product', ['exports', 'ember', 'ember-simple-auth/mixins/authenticated-route-mixin'], function (exports, _ember, _emberSimpleAuthMixinsAuthenticatedRouteMixin) {
+  exports['default'] = _ember['default'].Route.extend(_emberSimpleAuthMixinsAuthenticatedRouteMixin['default'], {});
+});
+define('trainwhistle/routes/product/alarms/edit', ['exports', 'ember'], function (exports, _ember) {
   exports['default'] = _ember['default'].Route.extend({});
 });
 define('trainwhistle/routes/product/alarms/index', ['exports', 'ember'], function (exports, _ember) {
-  exports['default'] = _ember['default'].Route.extend({});
-});
-define('trainwhistle/routes/product/alarms/list', ['exports', 'ember'], function (exports, _ember) {
   exports['default'] = _ember['default'].Route.extend({});
 });
 define('trainwhistle/routes/product/alarms/new', ['exports', 'ember'], function (exports, _ember) {
@@ -1383,7 +1564,9 @@ define('trainwhistle/routes/product/profile/edit', ['exports', 'ember'], functio
   exports['default'] = _ember['default'].Route.extend({});
 });
 define('trainwhistle/routes/product/profile/show', ['exports', 'ember'], function (exports, _ember) {
-  exports['default'] = _ember['default'].Route.extend({});
+  exports['default'] = _ember['default'].Route.extend({
+    sessionAccount: _ember['default'].inject.service()
+  });
 });
 define('trainwhistle/services/ajax', ['exports', 'ember-ajax/services/ajax'], function (exports, _emberAjaxServicesAjax) {
   Object.defineProperty(exports, 'default', {
@@ -1424,6 +1607,24 @@ define('trainwhistle/services/page-title-list', ['exports', 'ember-page-title/se
 
   exports['default'] = _emberPageTitleServicesPageTitleList['default'].extend(defaults);
 });
+define('trainwhistle/services/session-account', ['exports', 'ember'], function (exports, _ember) {
+  exports['default'] = _ember['default'].Service.extend({
+    session: _ember['default'].inject.service(),
+    store: _ember['default'].inject.service(),
+    loadCurrentUser: function loadCurrentUser() {
+      var _this = this;
+
+      if (this.get('session.isAuthenticated')) {
+        this.get('store').queryRecord('user', { me: true }).then(function (user) {
+          _this.set('currentUser', user);
+        });
+      }
+    }
+  });
+});
+define('trainwhistle/services/session', ['exports', 'ember-simple-auth/services/session'], function (exports, _emberSimpleAuthServicesSession) {
+  exports['default'] = _emberSimpleAuthServicesSession['default'];
+});
 define('trainwhistle/services/text-measurer', ['exports', 'ember-text-measurer/services/text-measurer'], function (exports, _emberTextMeasurerServicesTextMeasurer) {
   Object.defineProperty(exports, 'default', {
     enumerable: true,
@@ -1431,6 +1632,9 @@ define('trainwhistle/services/text-measurer', ['exports', 'ember-text-measurer/s
       return _emberTextMeasurerServicesTextMeasurer['default'];
     }
   });
+});
+define('trainwhistle/session-stores/application', ['exports', 'ember-simple-auth/session-stores/adaptive'], function (exports, _emberSimpleAuthSessionStoresAdaptive) {
+  exports['default'] = _emberSimpleAuthSessionStoresAdaptive['default'].extend();
 });
 define("trainwhistle/templates/application", ["exports"], function (exports) {
   exports["default"] = Ember.HTMLBars.template((function () {
@@ -1470,6 +1674,90 @@ define("trainwhistle/templates/application", ["exports"], function (exports) {
       statements: [["content", "outlet", ["loc", [null, [1, 0], [1, 10]]], 0, 0, 0, 0]],
       locals: [],
       templates: []
+    };
+  })());
+});
+define("trainwhistle/templates/components/missing-field", ["exports"], function (exports) {
+  exports["default"] = Ember.HTMLBars.template((function () {
+    var child0 = (function () {
+      return {
+        meta: {
+          "revision": "Ember@2.8.2",
+          "loc": {
+            "source": null,
+            "start": {
+              "line": 1,
+              "column": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 60
+            }
+          },
+          "moduleName": "trainwhistle/templates/components/missing-field.hbs"
+        },
+        isEmpty: false,
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createElement("i");
+          dom.setAttribute(el1, "class", "fa fa-plus");
+          dom.appendChild(el0, el1);
+          var el1 = dom.createTextNode("Add ");
+          dom.appendChild(el0, el1);
+          var el1 = dom.createComment("");
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(fragment, 2, 2, contextualElement);
+          dom.insertBoundary(fragment, null);
+          return morphs;
+        },
+        statements: [["content", "field", ["loc", [null, [1, 51], [1, 60]]], 0, 0, 0, 0]],
+        locals: [],
+        templates: []
+      };
+    })();
+    return {
+      meta: {
+        "revision": "Ember@2.8.2",
+        "loc": {
+          "source": null,
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 1,
+            "column": 72
+          }
+        },
+        "moduleName": "trainwhistle/templates/components/missing-field.hbs"
+      },
+      isEmpty: false,
+      arity: 0,
+      cachedFragment: null,
+      hasRendered: false,
+      buildFragment: function buildFragment(dom) {
+        var el0 = dom.createDocumentFragment();
+        var el1 = dom.createComment("");
+        dom.appendChild(el0, el1);
+        return el0;
+      },
+      buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+        var morphs = new Array(1);
+        morphs[0] = dom.createMorphAt(fragment, 0, 0, contextualElement);
+        dom.insertBoundary(fragment, 0);
+        dom.insertBoundary(fragment, null);
+        return morphs;
+      },
+      statements: [["block", "link-to", [["get", "location", ["loc", [null, [1, 11], [1, 19]]], 0, 0, 0, 0]], [], 0, null, ["loc", [null, [1, 0], [1, 72]]]]],
+      locals: [],
+      templates: [child0]
     };
   })());
 });
@@ -1545,7 +1833,7 @@ define("trainwhistle/templates/landing", ["exports"], function (exports) {
           },
           "end": {
             "line": 1,
-            "column": 231
+            "column": 218
           }
         },
         "moduleName": "trainwhistle/templates/landing.hbs"
@@ -1556,8 +1844,6 @@ define("trainwhistle/templates/landing", ["exports"], function (exports) {
       hasRendered: false,
       buildFragment: function buildFragment(dom) {
         var el0 = dom.createDocumentFragment();
-        var el1 = dom.createElement("main");
-        dom.appendChild(el0, el1);
         var el1 = dom.createElement("div");
         dom.setAttribute(el1, "class", "content-dialog");
         var el2 = dom.createElement("div");
@@ -1581,10 +1867,10 @@ define("trainwhistle/templates/landing", ["exports"], function (exports) {
       },
       buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
         var morphs = new Array(1);
-        morphs[0] = dom.createMorphAt(dom.childAt(fragment, [1, 0]), 0, 0);
+        morphs[0] = dom.createMorphAt(dom.childAt(fragment, [0, 0]), 0, 0);
         return morphs;
       },
-      statements: [["content", "outlet", ["loc", [null, [1, 65], [1, 75]]], 0, 0, 0, 0]],
+      statements: [["content", "outlet", ["loc", [null, [1, 52], [1, 62]]], 0, 0, 0, 0]],
       locals: [],
       templates: []
     };
@@ -1600,11 +1886,58 @@ define("trainwhistle/templates/landing/log-in", ["exports"], function (exports) 
             "source": null,
             "start": {
               "line": 1,
-              "column": 509
+              "column": 310
             },
             "end": {
               "line": 1,
-              "column": 576
+              "column": 417
+            }
+          },
+          "moduleName": "trainwhistle/templates/landing/log-in.hbs"
+        },
+        isEmpty: false,
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createElement("p");
+          dom.setAttribute(el1, "class", "text-center text-danger");
+          var el2 = dom.createElement("b");
+          var el3 = dom.createTextNode("Oops! ");
+          dom.appendChild(el2, el3);
+          dom.appendChild(el1, el2);
+          var el2 = dom.createComment("");
+          dom.appendChild(el1, el2);
+          dom.appendChild(el0, el1);
+          var el1 = dom.createElement("hr");
+          dom.setAttribute(el1, "class", "spacer");
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(dom.childAt(fragment, [0]), 1, 1);
+          return morphs;
+        },
+        statements: [["content", "errorMessage", ["loc", [null, [1, 378], [1, 394]]], 0, 0, 0, 0]],
+        locals: [],
+        templates: []
+      };
+    })();
+    var child1 = (function () {
+      return {
+        meta: {
+          "revision": "Ember@2.8.2",
+          "loc": {
+            "source": null,
+            "start": {
+              "line": 1,
+              "column": 825
+            },
+            "end": {
+              "line": 1,
+              "column": 892
             }
           },
           "moduleName": "trainwhistle/templates/landing/log-in.hbs"
@@ -1638,7 +1971,7 @@ define("trainwhistle/templates/landing/log-in", ["exports"], function (exports) 
           },
           "end": {
             "line": 1,
-            "column": 671
+            "column": 987
           }
         },
         "moduleName": "trainwhistle/templates/landing/log-in.hbs"
@@ -1677,15 +2010,15 @@ define("trainwhistle/templates/landing/log-in", ["exports"], function (exports) 
         dom.setAttribute(el1, "class", "spacer");
         dom.appendChild(el0, el1);
         var el1 = dom.createElement("form");
+        var el2 = dom.createComment("");
+        dom.appendChild(el1, el2);
         var el2 = dom.createElement("div");
         dom.setAttribute(el2, "class", "form-field");
         var el3 = dom.createElement("label");
         var el4 = dom.createTextNode("Email Address");
         dom.appendChild(el3, el4);
         dom.appendChild(el2, el3);
-        var el3 = dom.createElement("input");
-        dom.setAttribute(el3, "placeholder", "john.doe@example.com");
-        dom.setAttribute(el3, "type", "email");
+        var el3 = dom.createComment("");
         dom.appendChild(el2, el3);
         dom.appendChild(el1, el2);
         var el2 = dom.createElement("div");
@@ -1694,9 +2027,7 @@ define("trainwhistle/templates/landing/log-in", ["exports"], function (exports) 
         var el4 = dom.createTextNode("Password");
         dom.appendChild(el3, el4);
         dom.appendChild(el2, el3);
-        var el3 = dom.createElement("input");
-        dom.setAttribute(el3, "placeholder", "password");
-        dom.setAttribute(el3, "type", "password");
+        var el3 = dom.createComment("");
         dom.appendChild(el2, el3);
         dom.appendChild(el1, el2);
         var el2 = dom.createElement("div");
@@ -1715,14 +2046,19 @@ define("trainwhistle/templates/landing/log-in", ["exports"], function (exports) 
       },
       buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
         var element0 = dom.childAt(fragment, [0, 0]);
-        var morphs = new Array(2);
+        var element1 = dom.childAt(fragment, [3]);
+        var morphs = new Array(6);
         morphs[0] = dom.createAttrMorph(element0, 'width');
-        morphs[1] = dom.createMorphAt(dom.childAt(fragment, [3, 2]), 0, 0);
+        morphs[1] = dom.createElementMorph(element1);
+        morphs[2] = dom.createMorphAt(element1, 0, 0);
+        morphs[3] = dom.createMorphAt(dom.childAt(element1, [1]), 1, 1);
+        morphs[4] = dom.createMorphAt(dom.childAt(element1, [2]), 1, 1);
+        morphs[5] = dom.createMorphAt(dom.childAt(element1, [3]), 0, 0);
         return morphs;
       },
-      statements: [["attribute", "width", 400, 0, 0, 0, 0], ["block", "link-to", ["landing.sign-up"], ["class", "btn btn-ghost-default"], 0, null, ["loc", [null, [1, 509], [1, 588]]]]],
+      statements: [["attribute", "width", 400, 0, 0, 0, 0], ["element", "action", ["authenticate"], ["on", "submit"], ["loc", [null, [1, 272], [1, 309]]], 0, 0], ["block", "if", [["get", "errorMessage", ["loc", [null, [1, 316], [1, 328]]], 0, 0, 0, 0]], [], 0, null, ["loc", [null, [1, 310], [1, 424]]]], ["inline", "input", [], ["placeholder", "john.doe@example.com", "name", "email", "type", "email", "value", ["subexpr", "@mut", [["get", "email", ["loc", [null, [1, 551], [1, 556]]], 0, 0, 0, 0]], [], [], 0, 0], "required", true, "autocapitalize", "off", "autocorrect", "off", "autocomplete", "email", "required", true, "inputmode", "email"], ["loc", [null, [1, 476], [1, 664]]], 0, 0], ["inline", "input", [], ["placeholder", "password", "type", "password", "value", ["subexpr", "@mut", [["get", "password", ["loc", [null, [1, 770], [1, 778]]], 0, 0, 0, 0]], [], [], 0, 0], "required", true], ["loc", [null, [1, 717], [1, 794]]], 0, 0], ["block", "link-to", ["landing.sign-up"], ["class", "btn btn-ghost-default"], 1, null, ["loc", [null, [1, 825], [1, 904]]]]],
       locals: [],
-      templates: [child0]
+      templates: [child0, child1]
     };
   })());
 });
@@ -1736,11 +2072,11 @@ define("trainwhistle/templates/landing/sign-up", ["exports"], function (exports)
             "source": null,
             "start": {
               "line": 1,
-              "column": 1199
+              "column": 1638
             },
             "end": {
               "line": 1,
-              "column": 1264
+              "column": 1703
             }
           },
           "moduleName": "trainwhistle/templates/landing/sign-up.hbs"
@@ -1774,7 +2110,7 @@ define("trainwhistle/templates/landing/sign-up", ["exports"], function (exports)
           },
           "end": {
             "line": 1,
-            "column": 1360
+            "column": 1799
           }
         },
         "moduleName": "trainwhistle/templates/landing/sign-up.hbs"
@@ -1810,14 +2146,7 @@ define("trainwhistle/templates/landing/sign-up", ["exports"], function (exports)
         var el5 = dom.createTextNode("First Name");
         dom.appendChild(el4, el5);
         dom.appendChild(el3, el4);
-        var el4 = dom.createElement("input");
-        dom.setAttribute(el4, "placeholder", "John");
-        dom.setAttribute(el4, "type", "text");
-        dom.setAttribute(el4, "name", "first_name");
-        dom.setAttribute(el4, "autocapitalize", "words");
-        dom.setAttribute(el4, "autocorrect", "off");
-        dom.setAttribute(el4, "autocomplete", "given-name");
-        dom.setAttribute(el4, "inputmode", "latin-name");
+        var el4 = dom.createComment("");
         dom.appendChild(el3, el4);
         dom.appendChild(el2, el3);
         var el3 = dom.createElement("div");
@@ -1826,56 +2155,44 @@ define("trainwhistle/templates/landing/sign-up", ["exports"], function (exports)
         var el5 = dom.createTextNode("Last Name");
         dom.appendChild(el4, el5);
         dom.appendChild(el3, el4);
-        var el4 = dom.createElement("input");
-        dom.setAttribute(el4, "placeholder", "Doe");
-        dom.setAttribute(el4, "type", "text");
-        dom.setAttribute(el4, "name", "last_name");
-        dom.setAttribute(el4, "autocapitalize", "words");
-        dom.setAttribute(el4, "autocorrect", "off");
-        dom.setAttribute(el4, "autocomplete", "family-name");
-        dom.setAttribute(el4, "inputmode", "latin-name");
+        var el4 = dom.createComment("");
         dom.appendChild(el3, el4);
         dom.appendChild(el2, el3);
         dom.appendChild(el1, el2);
         var el2 = dom.createElement("div");
-        dom.setAttribute(el2, "class", "form-field");
+        dom.setAttribute(el2, "class", "form-field top-layer required");
+        var el3 = dom.createElement("label");
+        var el4 = dom.createTextNode("Phone Number");
+        dom.appendChild(el3, el4);
+        dom.appendChild(el2, el3);
+        var el3 = dom.createComment("");
+        dom.appendChild(el2, el3);
+        dom.appendChild(el1, el2);
+        var el2 = dom.createElement("div");
+        dom.setAttribute(el2, "class", "form-field required");
         var el3 = dom.createElement("label");
         var el4 = dom.createTextNode("Email Address");
         dom.appendChild(el3, el4);
         dom.appendChild(el2, el3);
-        var el3 = dom.createElement("input");
-        dom.setAttribute(el3, "placeholder", "john.doe@example.com");
-        dom.setAttribute(el3, "type", "email");
-        dom.setAttribute(el3, "name", "email");
-        dom.setAttribute(el3, "autocapitalize", "off");
-        dom.setAttribute(el3, "autocorrect", "off");
-        dom.setAttribute(el3, "autocomplete", "email");
-        dom.setAttribute(el3, "required", "");
-        dom.setAttribute(el3, "inputmode", "email");
+        var el3 = dom.createComment("");
         dom.appendChild(el2, el3);
         dom.appendChild(el1, el2);
         var el2 = dom.createElement("div");
-        dom.setAttribute(el2, "class", "form-field");
+        dom.setAttribute(el2, "class", "form-field required");
         var el3 = dom.createElement("label");
         var el4 = dom.createTextNode("Password");
         dom.appendChild(el3, el4);
         dom.appendChild(el2, el3);
-        var el3 = dom.createElement("input");
-        dom.setAttribute(el3, "placeholder", "password");
-        dom.setAttribute(el3, "type", "password");
-        dom.setAttribute(el3, "name", "password");
+        var el3 = dom.createComment("");
         dom.appendChild(el2, el3);
         dom.appendChild(el1, el2);
         var el2 = dom.createElement("div");
-        dom.setAttribute(el2, "class", "form-field");
+        dom.setAttribute(el2, "class", "form-field required");
         var el3 = dom.createElement("label");
         var el4 = dom.createTextNode("Confirm Password");
         dom.appendChild(el3, el4);
         dom.appendChild(el2, el3);
-        var el3 = dom.createElement("input");
-        dom.setAttribute(el3, "placeholder", "password");
-        dom.setAttribute(el3, "type", "password");
-        dom.setAttribute(el3, "name", "password_confirmation");
+        var el3 = dom.createComment("");
         dom.appendChild(el2, el3);
         dom.appendChild(el1, el2);
         var el2 = dom.createElement("div");
@@ -1894,12 +2211,21 @@ define("trainwhistle/templates/landing/sign-up", ["exports"], function (exports)
       },
       buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
         var element0 = dom.childAt(fragment, [0, 0]);
-        var morphs = new Array(2);
+        var element1 = dom.childAt(fragment, [3]);
+        var element2 = dom.childAt(element1, [0]);
+        var morphs = new Array(9);
         morphs[0] = dom.createAttrMorph(element0, 'width');
-        morphs[1] = dom.createMorphAt(dom.childAt(fragment, [3, 4]), 0, 0);
+        morphs[1] = dom.createElementMorph(element1);
+        morphs[2] = dom.createMorphAt(dom.childAt(element2, [0]), 1, 1);
+        morphs[3] = dom.createMorphAt(dom.childAt(element2, [1]), 1, 1);
+        morphs[4] = dom.createMorphAt(dom.childAt(element1, [1]), 1, 1);
+        morphs[5] = dom.createMorphAt(dom.childAt(element1, [2]), 1, 1);
+        morphs[6] = dom.createMorphAt(dom.childAt(element1, [3]), 1, 1);
+        morphs[7] = dom.createMorphAt(dom.childAt(element1, [4]), 1, 1);
+        morphs[8] = dom.createMorphAt(dom.childAt(element1, [5]), 0, 0);
         return morphs;
       },
-      statements: [["attribute", "width", 400, 0, 0, 0, 0], ["block", "link-to", ["landing.log-in"], ["class", "btn btn-ghost-default"], 0, null, ["loc", [null, [1, 1199], [1, 1276]]]]],
+      statements: [["attribute", "width", 400, 0, 0, 0, 0], ["element", "action", ["register"], ["on", "submit"], ["loc", [null, [1, 280], [1, 313]]], 0, 0], ["inline", "input", [], ["placeholder", "John", "type", "text", "name", "first_name", "autocapitalize", "words", "autocorrect", "off", "autocomplete", "given-name", "inputmode", "latin-name", "value", ["subexpr", "@mut", [["get", "firstName", ["loc", [null, [1, 540], [1, 549]]], 0, 0, 0, 0]], [], [], 0, 0]], ["loc", [null, [1, 387], [1, 551]]], 0, 0], ["inline", "input", [], ["placeholder", "Doe", "type", "text", "name", "last_name", "autocapitalize", "words", "autocorrect", "off", "autocomplete", "family-name", "inputmode", "latin-name", "value", ["subexpr", "@mut", [["get", "lastName", ["loc", [null, [1, 757], [1, 765]]], 0, 0, 0, 0]], [], [], 0, 0]], ["loc", [null, [1, 605], [1, 767]]], 0, 0], ["inline", "intl-tel-input", [], ["type", "tel", "autocapitalize", "none", "autocorrect", "on", "autocomplete", "tel", "name", "phone", "placeholder", "+1 (555) 555-555", "inputmode", "tel", "required", true, "number", ["subexpr", "@mut", [["get", "phone", ["loc", [null, [1, 1016], [1, 1021]]], 0, 0, 0, 0]], [], [], 0, 0]], ["loc", [null, [1, 849], [1, 1023]]], 0, 0], ["inline", "input", [], ["placeholder", "john.doe@example.com", "type", "email", "name", "email", "autocapitalize", "off", "autocorrect", "off", "autocomplete", "email", "required", true, "inputmode", "email", "value", ["subexpr", "@mut", [["get", "email", ["loc", [null, [1, 1257], [1, 1262]]], 0, 0, 0, 0]], [], [], 0, 0]], ["loc", [null, [1, 1090], [1, 1264]]], 0, 0], ["inline", "input", [], ["placeholder", "password", "type", "password", "name", "password", "required", true, "value", ["subexpr", "@mut", [["get", "password", ["loc", [null, [1, 1409], [1, 1417]]], 0, 0, 0, 0]], [], [], 0, 0]], ["loc", [null, [1, 1326], [1, 1419]]], 0, 0], ["inline", "input", [], ["placeholder", "password", "type", "password", "name", "password_confirmation", "required", true, "value", ["subexpr", "@mut", [["get", "passwordConfirmation", ["loc", [null, [1, 1585], [1, 1605]]], 0, 0, 0, 0]], [], [], 0, 0]], ["loc", [null, [1, 1489], [1, 1607]]], 0, 0], ["block", "link-to", ["landing.log-in"], ["class", "btn btn-ghost-default"], 0, null, ["loc", [null, [1, 1638], [1, 1715]]]]],
       locals: [],
       templates: [child0]
     };
@@ -2158,17 +2484,74 @@ define("trainwhistle/templates/product/alarms/index", ["exports"], function (exp
           },
           "end": {
             "line": 1,
-            "column": 0
+            "column": 689
           }
         },
         "moduleName": "trainwhistle/templates/product/alarms/index.hbs"
       },
-      isEmpty: true,
+      isEmpty: false,
       arity: 0,
       cachedFragment: null,
       hasRendered: false,
       buildFragment: function buildFragment(dom) {
         var el0 = dom.createDocumentFragment();
+        var el1 = dom.createElement("div");
+        dom.setAttribute(el1, "class", "row");
+        var el2 = dom.createElement("div");
+        dom.setAttribute(el2, "class", "col");
+        var el3 = dom.createElement("div");
+        dom.setAttribute(el3, "class", "dialog-box");
+        var el4 = dom.createElement("h1");
+        var el5 = dom.createTextNode("My Alarms");
+        dom.appendChild(el4, el5);
+        dom.appendChild(el3, el4);
+        var el4 = dom.createElement("p");
+        var el5 = dom.createTextNode("Set an alarm to let you know when you need to leave your home to reach MARTA in time to get work. We'll check on all the trains and make sure to notify you early enough that you're always on time.");
+        dom.appendChild(el4, el5);
+        dom.appendChild(el3, el4);
+        var el4 = dom.createElement("hr");
+        dom.appendChild(el3, el4);
+        var el4 = dom.createElement("div");
+        dom.setAttribute(el4, "class", "alarm");
+        var el5 = dom.createElement("h3");
+        var el6 = dom.createTextNode("Morning Wake Up Call - ");
+        dom.appendChild(el5, el6);
+        var el6 = dom.createElement("span");
+        dom.setAttribute(el6, "class", "text-danger");
+        var el7 = dom.createTextNode("Red Line");
+        dom.appendChild(el6, el7);
+        dom.appendChild(el5, el6);
+        var el6 = dom.createTextNode(", Five Points");
+        dom.appendChild(el5, el6);
+        dom.appendChild(el4, el5);
+        var el5 = dom.createElement("div");
+        dom.setAttribute(el5, "class", "time-info");
+        var el6 = dom.createElement("i");
+        dom.setAttribute(el6, "class", "fa fa-clock-o");
+        var el7 = dom.createTextNode("  ");
+        dom.appendChild(el6, el7);
+        dom.appendChild(el5, el6);
+        var el6 = dom.createTextNode("Get on train between 9:00am and 9:30am  |  ");
+        dom.appendChild(el5, el6);
+        var el6 = dom.createElement("i");
+        dom.setAttribute(el6, "class", "fa fa-calendar");
+        var el7 = dom.createTextNode("  ");
+        dom.appendChild(el6, el7);
+        dom.appendChild(el5, el6);
+        var el6 = dom.createTextNode("M, W, F");
+        dom.appendChild(el5, el6);
+        dom.appendChild(el4, el5);
+        dom.appendChild(el3, el4);
+        dom.appendChild(el2, el3);
+        dom.appendChild(el1, el2);
+        var el2 = dom.createElement("div");
+        dom.setAttribute(el2, "class", "col");
+        dom.appendChild(el1, el2);
+        dom.appendChild(el0, el1);
+        var el1 = dom.createElement("div");
+        dom.setAttribute(el1, "style", "background-image: url('/images/marta-train.jpg');");
+        dom.setAttribute(el1, "class", "image-underlay");
+        dom.appendChild(el0, el1);
         return el0;
       },
       buildRenderNodes: function buildRenderNodes() {
@@ -2285,8 +2668,78 @@ define("trainwhistle/templates/product/dashboard", ["exports"], function (export
     };
   })());
 });
-define("trainwhistle/templates/product/user/edit", ["exports"], function (exports) {
+define("trainwhistle/templates/product/profile/edit", ["exports"], function (exports) {
   exports["default"] = Ember.HTMLBars.template((function () {
+    var child0 = (function () {
+      return {
+        meta: {
+          "revision": "Ember@2.8.2",
+          "loc": {
+            "source": null,
+            "start": {
+              "line": 1,
+              "column": 1339
+            },
+            "end": {
+              "line": 1,
+              "column": 1415
+            }
+          },
+          "moduleName": "trainwhistle/templates/product/profile/edit.hbs"
+        },
+        isEmpty: false,
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createTextNode("Back");
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes() {
+          return [];
+        },
+        statements: [],
+        locals: [],
+        templates: []
+      };
+    })();
+    var child1 = (function () {
+      return {
+        meta: {
+          "revision": "Ember@2.8.2",
+          "loc": {
+            "source": null,
+            "start": {
+              "line": 1,
+              "column": 1427
+            },
+            "end": {
+              "line": 1,
+              "column": 1514
+            }
+          },
+          "moduleName": "trainwhistle/templates/product/profile/edit.hbs"
+        },
+        isEmpty: false,
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createTextNode("Save Changes");
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes() {
+          return [];
+        },
+        statements: [],
+        locals: [],
+        templates: []
+      };
+    })();
     return {
       meta: {
         "revision": "Ember@2.8.2",
@@ -2298,30 +2751,387 @@ define("trainwhistle/templates/product/user/edit", ["exports"], function (export
           },
           "end": {
             "line": 1,
-            "column": 0
+            "column": 1660
           }
         },
-        "moduleName": "trainwhistle/templates/product/user/edit.hbs"
+        "moduleName": "trainwhistle/templates/product/profile/edit.hbs"
       },
-      isEmpty: true,
+      isEmpty: false,
       arity: 0,
       cachedFragment: null,
       hasRendered: false,
       buildFragment: function buildFragment(dom) {
         var el0 = dom.createDocumentFragment();
+        var el1 = dom.createComment("");
+        dom.appendChild(el0, el1);
+        var el1 = dom.createElement("div");
+        dom.setAttribute(el1, "class", "row align-stretch flex-grow");
+        var el2 = dom.createElement("div");
+        dom.setAttribute(el2, "class", "col");
+        var el3 = dom.createElement("h1");
+        var el4 = dom.createTextNode("Edit Profile");
+        dom.appendChild(el3, el4);
+        dom.appendChild(el2, el3);
+        var el3 = dom.createElement("p");
+        var el4 = dom.createTextNode("Feel free to edit the contact information below. You must provide your password to update it.");
+        dom.appendChild(el3, el4);
+        dom.appendChild(el2, el3);
+        var el3 = dom.createElement("form");
+        var el4 = dom.createElement("div");
+        dom.setAttribute(el4, "class", "fields-row");
+        var el5 = dom.createElement("div");
+        dom.setAttribute(el5, "class", "form-field");
+        var el6 = dom.createElement("label");
+        var el7 = dom.createTextNode("First Name");
+        dom.appendChild(el6, el7);
+        dom.appendChild(el5, el6);
+        var el6 = dom.createComment("");
+        dom.appendChild(el5, el6);
+        dom.appendChild(el4, el5);
+        var el5 = dom.createElement("div");
+        dom.setAttribute(el5, "class", "form-field");
+        var el6 = dom.createElement("label");
+        var el7 = dom.createTextNode("Last Name");
+        dom.appendChild(el6, el7);
+        dom.appendChild(el5, el6);
+        var el6 = dom.createComment("");
+        dom.appendChild(el5, el6);
+        dom.appendChild(el4, el5);
+        dom.appendChild(el3, el4);
+        var el4 = dom.createElement("div");
+        dom.setAttribute(el4, "class", "form-field");
+        var el5 = dom.createElement("label");
+        var el6 = dom.createTextNode("Phone Number");
+        dom.appendChild(el5, el6);
+        dom.appendChild(el4, el5);
+        var el5 = dom.createComment("");
+        dom.appendChild(el4, el5);
+        dom.appendChild(el3, el4);
+        var el4 = dom.createElement("div");
+        dom.setAttribute(el4, "class", "form-field required");
+        var el5 = dom.createElement("label");
+        var el6 = dom.createTextNode("Email Address");
+        dom.appendChild(el5, el6);
+        dom.appendChild(el4, el5);
+        var el5 = dom.createComment("");
+        dom.appendChild(el4, el5);
+        dom.appendChild(el3, el4);
+        dom.appendChild(el2, el3);
+        var el3 = dom.createElement("hr");
+        dom.setAttribute(el3, "class", "spacer");
+        dom.appendChild(el2, el3);
+        var el3 = dom.createElement("div");
+        dom.setAttribute(el3, "class", "buttons-row");
+        var el4 = dom.createComment("");
+        dom.appendChild(el3, el4);
+        var el4 = dom.createComment("");
+        dom.appendChild(el3, el4);
+        dom.appendChild(el2, el3);
+        dom.appendChild(el1, el2);
+        var el2 = dom.createElement("div");
+        dom.setAttribute(el2, "style", "background-image: url('/images/marta-station.jpg');");
+        dom.setAttribute(el2, "class", "col imaged full-page-right hidden-xs");
+        dom.appendChild(el1, el2);
+        dom.appendChild(el0, el1);
         return el0;
       },
-      buildRenderNodes: function buildRenderNodes() {
-        return [];
+      buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+        var element0 = dom.childAt(fragment, [1, 0]);
+        var element1 = dom.childAt(element0, [2]);
+        var element2 = dom.childAt(element1, [0]);
+        var element3 = dom.childAt(element0, [4]);
+        var morphs = new Array(8);
+        morphs[0] = dom.createMorphAt(fragment, 0, 0, contextualElement);
+        morphs[1] = dom.createElementMorph(element1);
+        morphs[2] = dom.createMorphAt(dom.childAt(element2, [0]), 1, 1);
+        morphs[3] = dom.createMorphAt(dom.childAt(element2, [1]), 1, 1);
+        morphs[4] = dom.createMorphAt(dom.childAt(element1, [1]), 1, 1);
+        morphs[5] = dom.createMorphAt(dom.childAt(element1, [2]), 1, 1);
+        morphs[6] = dom.createMorphAt(element3, 0, 0);
+        morphs[7] = dom.createMorphAt(element3, 1, 1);
+        dom.insertBoundary(fragment, 0);
+        return morphs;
       },
-      statements: [],
+      statements: [["inline", "page-title", ["Edit Profile"], [], ["loc", [null, [1, 0], [1, 24]]], 0, 0], ["element", "action", ["update"], ["on", "submit"], ["loc", [null, [1, 209], [1, 240]]], 0, 0], ["inline", "input", [], ["type", "text", "autocapitalize", "words", "autocorrect", "off", "autocomplete", "given-name", "name", "name", "placeholder", "John", "required", true, "inputmode", "latin-name", "value", ["subexpr", "@mut", [["get", "sessionAccount.currentUser.first_name", ["loc", [null, [1, 475], [1, 512]]], 0, 0, 0, 0]], [], [], 0, 0]], ["loc", [null, [1, 314], [1, 514]]], 0, 0], ["inline", "input", [], ["type", "text", "autocapitalize", "words", "autocorrect", "off", "autocomplete", "family-name", "name", "name", "placeholder", "Doe", "required", true, "inputmode", "latin-name", "value", ["subexpr", "@mut", [["get", "sessionAccount.currentUser.last_name", ["loc", [null, [1, 729], [1, 765]]], 0, 0, 0, 0]], [], [], 0, 0]], ["loc", [null, [1, 568], [1, 767]]], 0, 0], ["inline", "intl-tel-input", [], ["type", "tel", "autocapitalize", "none", "autocorrect", "on", "autocomplete", "tel", "name", "phone", "placeholder", "+1 (555) 555-555", "inputmode", "tel", "value", ["subexpr", "@mut", [["get", "sessionAccount.currentUser.phone", ["loc", [null, [1, 982], [1, 1014]]], 0, 0, 0, 0]], [], [], 0, 0]], ["loc", [null, [1, 830], [1, 1016]]], 0, 0], ["inline", "input", [], ["type", "email", "autocapitalize", "off", "autocorrect", "off", "autocomplete", "email", "name", "email", "placeholder", "john.doe@gmail.com", "required", true, "inputmode", "email", "value", ["subexpr", "@mut", [["get", "sessionAccount.currentUser.email", ["loc", [null, [1, 1248], [1, 1280]]], 0, 0, 0, 0]], [], [], 0, 0]], ["loc", [null, [1, 1083], [1, 1282]]], 0, 0], ["block", "link-to", ["product.profile.show"], ["class", "btn btn-ghost-default btn-sm"], 0, null, ["loc", [null, [1, 1339], [1, 1427]]]], ["block", "link-to", ["product.profile.show"], ["class", "btn btn-success btn-sm btn-main"], 1, null, ["loc", [null, [1, 1427], [1, 1526]]]]],
       locals: [],
-      templates: []
+      templates: [child0, child1]
     };
   })());
 });
-define("trainwhistle/templates/product/user/show", ["exports"], function (exports) {
+define("trainwhistle/templates/product/profile/show", ["exports"], function (exports) {
   exports["default"] = Ember.HTMLBars.template((function () {
+    var child0 = (function () {
+      return {
+        meta: {
+          "revision": "Ember@2.8.2",
+          "loc": {
+            "source": null,
+            "start": {
+              "line": 1,
+              "column": 272
+            },
+            "end": {
+              "line": 1,
+              "column": 371
+            }
+          },
+          "moduleName": "trainwhistle/templates/product/profile/show.hbs"
+        },
+        isEmpty: false,
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createElement("div");
+          dom.setAttribute(el1, "class", "value");
+          var el2 = dom.createComment("");
+          dom.appendChild(el1, el2);
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(dom.childAt(fragment, [0]), 0, 0);
+          return morphs;
+        },
+        statements: [["content", "sessionAccount.currentUser.name", ["loc", [null, [1, 330], [1, 365]]], 0, 0, 0, 0]],
+        locals: [],
+        templates: []
+      };
+    })();
+    var child1 = (function () {
+      return {
+        meta: {
+          "revision": "Ember@2.8.2",
+          "loc": {
+            "source": null,
+            "start": {
+              "line": 1,
+              "column": 371
+            },
+            "end": {
+              "line": 1,
+              "column": 441
+            }
+          },
+          "moduleName": "trainwhistle/templates/product/profile/show.hbs"
+        },
+        isEmpty: false,
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createComment("");
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(fragment, 0, 0, contextualElement);
+          dom.insertBoundary(fragment, 0);
+          dom.insertBoundary(fragment, null);
+          return morphs;
+        },
+        statements: [["inline", "missing-field", [], ["field", "Name", "location", "product.profile.edit"], ["loc", [null, [1, 379], [1, 441]]], 0, 0]],
+        locals: [],
+        templates: []
+      };
+    })();
+    var child2 = (function () {
+      return {
+        meta: {
+          "revision": "Ember@2.8.2",
+          "loc": {
+            "source": null,
+            "start": {
+              "line": 1,
+              "column": 527
+            },
+            "end": {
+              "line": 1,
+              "column": 628
+            }
+          },
+          "moduleName": "trainwhistle/templates/product/profile/show.hbs"
+        },
+        isEmpty: false,
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createElement("div");
+          dom.setAttribute(el1, "class", "value");
+          var el2 = dom.createComment("");
+          dom.appendChild(el1, el2);
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(dom.childAt(fragment, [0]), 0, 0);
+          return morphs;
+        },
+        statements: [["content", "sessionAccount.currentUser.email", ["loc", [null, [1, 586], [1, 622]]], 0, 0, 0, 0]],
+        locals: [],
+        templates: []
+      };
+    })();
+    var child3 = (function () {
+      return {
+        meta: {
+          "revision": "Ember@2.8.2",
+          "loc": {
+            "source": null,
+            "start": {
+              "line": 1,
+              "column": 628
+            },
+            "end": {
+              "line": 1,
+              "column": 699
+            }
+          },
+          "moduleName": "trainwhistle/templates/product/profile/show.hbs"
+        },
+        isEmpty: false,
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createComment("");
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(fragment, 0, 0, contextualElement);
+          dom.insertBoundary(fragment, 0);
+          dom.insertBoundary(fragment, null);
+          return morphs;
+        },
+        statements: [["inline", "missing-field", [], ["field", "Email", "location", "product.profile.edit"], ["loc", [null, [1, 636], [1, 699]]], 0, 0]],
+        locals: [],
+        templates: []
+      };
+    })();
+    var child4 = (function () {
+      return {
+        meta: {
+          "revision": "Ember@2.8.2",
+          "loc": {
+            "source": null,
+            "start": {
+              "line": 1,
+              "column": 779
+            },
+            "end": {
+              "line": 1,
+              "column": 880
+            }
+          },
+          "moduleName": "trainwhistle/templates/product/profile/show.hbs"
+        },
+        isEmpty: false,
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createElement("div");
+          dom.setAttribute(el1, "class", "value");
+          var el2 = dom.createComment("");
+          dom.appendChild(el1, el2);
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(dom.childAt(fragment, [0]), 0, 0);
+          return morphs;
+        },
+        statements: [["content", "sessionAccount.currentUser.phone", ["loc", [null, [1, 838], [1, 874]]], 0, 0, 0, 0]],
+        locals: [],
+        templates: []
+      };
+    })();
+    var child5 = (function () {
+      return {
+        meta: {
+          "revision": "Ember@2.8.2",
+          "loc": {
+            "source": null,
+            "start": {
+              "line": 1,
+              "column": 880
+            },
+            "end": {
+              "line": 1,
+              "column": 951
+            }
+          },
+          "moduleName": "trainwhistle/templates/product/profile/show.hbs"
+        },
+        isEmpty: false,
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createComment("");
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var morphs = new Array(1);
+          morphs[0] = dom.createMorphAt(fragment, 0, 0, contextualElement);
+          dom.insertBoundary(fragment, 0);
+          dom.insertBoundary(fragment, null);
+          return morphs;
+        },
+        statements: [["inline", "missing-field", [], ["field", "Phone", "location", "product.profile.edit"], ["loc", [null, [1, 888], [1, 951]]], 0, 0]],
+        locals: [],
+        templates: []
+      };
+    })();
+    var child6 = (function () {
+      return {
+        meta: {
+          "revision": "Ember@2.8.2",
+          "loc": {
+            "source": null,
+            "start": {
+              "line": 1,
+              "column": 993
+            },
+            "end": {
+              "line": 1,
+              "column": 1074
+            }
+          },
+          "moduleName": "trainwhistle/templates/product/profile/show.hbs"
+        },
+        isEmpty: false,
+        arity: 0,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createTextNode("Edit My Profile");
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes() {
+          return [];
+        },
+        statements: [],
+        locals: [],
+        templates: []
+      };
+    })();
     return {
       meta: {
         "revision": "Ember@2.8.2",
@@ -2333,25 +3143,101 @@ define("trainwhistle/templates/product/user/show", ["exports"], function (export
           },
           "end": {
             "line": 1,
-            "column": 0
+            "column": 1214
           }
         },
-        "moduleName": "trainwhistle/templates/product/user/show.hbs"
+        "moduleName": "trainwhistle/templates/product/profile/show.hbs"
       },
-      isEmpty: true,
+      isEmpty: false,
       arity: 0,
       cachedFragment: null,
       hasRendered: false,
       buildFragment: function buildFragment(dom) {
         var el0 = dom.createDocumentFragment();
+        var el1 = dom.createComment("");
+        dom.appendChild(el0, el1);
+        var el1 = dom.createElement("div");
+        dom.setAttribute(el1, "class", "row align-stretch flex-grow");
+        var el2 = dom.createElement("div");
+        dom.setAttribute(el2, "class", "col");
+        var el3 = dom.createElement("h1");
+        var el4 = dom.createTextNode("My Profile");
+        dom.appendChild(el3, el4);
+        dom.appendChild(el2, el3);
+        var el3 = dom.createElement("p");
+        var el4 = dom.createTextNode("Here's the contact information we currently have on file for you:");
+        dom.appendChild(el3, el4);
+        dom.appendChild(el2, el3);
+        var el3 = dom.createElement("div");
+        dom.setAttribute(el3, "class", "box");
+        var el4 = dom.createElement("ul");
+        dom.setAttribute(el4, "class", "details-list");
+        var el5 = dom.createElement("li");
+        var el6 = dom.createElement("div");
+        dom.setAttribute(el6, "class", "label");
+        var el7 = dom.createElement("i");
+        dom.setAttribute(el7, "class", "fa fa-user");
+        dom.appendChild(el6, el7);
+        var el7 = dom.createTextNode("Name");
+        dom.appendChild(el6, el7);
+        dom.appendChild(el5, el6);
+        var el6 = dom.createComment("");
+        dom.appendChild(el5, el6);
+        dom.appendChild(el4, el5);
+        var el5 = dom.createElement("li");
+        var el6 = dom.createElement("div");
+        dom.setAttribute(el6, "class", "label");
+        var el7 = dom.createElement("i");
+        dom.setAttribute(el7, "class", "fa fa-envelope-o");
+        dom.appendChild(el6, el7);
+        var el7 = dom.createTextNode("Email Address");
+        dom.appendChild(el6, el7);
+        dom.appendChild(el5, el6);
+        var el6 = dom.createComment("");
+        dom.appendChild(el5, el6);
+        dom.appendChild(el4, el5);
+        var el5 = dom.createElement("li");
+        var el6 = dom.createElement("div");
+        dom.setAttribute(el6, "class", "label");
+        var el7 = dom.createElement("i");
+        dom.setAttribute(el7, "class", "fa fa-phone");
+        dom.appendChild(el6, el7);
+        var el7 = dom.createTextNode("Phone Number");
+        dom.appendChild(el6, el7);
+        dom.appendChild(el5, el6);
+        var el6 = dom.createComment("");
+        dom.appendChild(el5, el6);
+        dom.appendChild(el4, el5);
+        dom.appendChild(el3, el4);
+        dom.appendChild(el2, el3);
+        var el3 = dom.createElement("hr");
+        dom.setAttribute(el3, "class", "spacer");
+        dom.appendChild(el2, el3);
+        var el3 = dom.createComment("");
+        dom.appendChild(el2, el3);
+        dom.appendChild(el1, el2);
+        var el2 = dom.createElement("div");
+        dom.setAttribute(el2, "style", "background-image: url('/images/marta-station.jpg');");
+        dom.setAttribute(el2, "class", "col imaged full-page-right hidden-xs");
+        dom.appendChild(el1, el2);
+        dom.appendChild(el0, el1);
         return el0;
       },
-      buildRenderNodes: function buildRenderNodes() {
-        return [];
+      buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+        var element0 = dom.childAt(fragment, [1, 0]);
+        var element1 = dom.childAt(element0, [2, 0]);
+        var morphs = new Array(5);
+        morphs[0] = dom.createMorphAt(fragment, 0, 0, contextualElement);
+        morphs[1] = dom.createMorphAt(dom.childAt(element1, [0]), 1, 1);
+        morphs[2] = dom.createMorphAt(dom.childAt(element1, [1]), 1, 1);
+        morphs[3] = dom.createMorphAt(dom.childAt(element1, [2]), 1, 1);
+        morphs[4] = dom.createMorphAt(element0, 4, 4);
+        dom.insertBoundary(fragment, 0);
+        return morphs;
       },
-      statements: [],
+      statements: [["inline", "page-title", ["My Profile"], [], ["loc", [null, [1, 0], [1, 22]]], 0, 0], ["block", "if", [["get", "sessionAccount.currentUser.name", ["loc", [null, [1, 278], [1, 309]]], 0, 0, 0, 0]], [], 0, 1, ["loc", [null, [1, 272], [1, 448]]]], ["block", "if", [["get", "sessionAccount.currentUser.email", ["loc", [null, [1, 533], [1, 565]]], 0, 0, 0, 0]], [], 2, 3, ["loc", [null, [1, 527], [1, 706]]]], ["block", "if", [["get", "sessionAccount.currentUser.phone", ["loc", [null, [1, 785], [1, 817]]], 0, 0, 0, 0]], [], 4, 5, ["loc", [null, [1, 779], [1, 958]]]], ["block", "link-to", ["product.profile.edit"], ["class", "btn btn-primary btn-sm"], 6, null, ["loc", [null, [1, 993], [1, 1086]]]]],
       locals: [],
-      templates: []
+      templates: [child0, child1, child2, child3, child4, child5, child6]
     };
   })());
 });
@@ -2372,7 +3258,7 @@ define('trainwhistle/utils/titleize', ['exports', 'ember-composable-helpers/util
 /* jshint ignore:start */
 
 define('trainwhistle/config/environment', ['ember'], function(Ember) {
-  var exports = {'default': {"modulePrefix":"trainwhistle","environment":"development","rootURL":"/","locationType":"auto","EmberENV":{"FEATURES":{}},"APP":{"name":"trainwhistle","version":"0.0.0+04aa2e5e"},"ember-cli-post-build-copy":{"replace":true,"verbose":false,"development":[["/assets/vendor.js","../web/static/vendor/vendor.js"],["/assets/trainwhistle.js","../web/static/vendor/trainwhistle.js"],["/assets/vendor.css","../web/static/css/vendor.css"],["/assets/trainwhistle.css","../web/static/css/trainwhistle.css"],["/images/city-poster.jpg","../web/static/assets/images/city-poster.jpg"],["/images/favicon.png","../web/static/assets/images/favicon.png"],["/images/logo-color.svg","../web/static/assets/images/logo-color.svg"],["/images/logo-icon-white.svg","../web/static/assets/images/logo-icon-white.svg"],["/images/logo.svg","../web/static/assets/images/logo.svg"],["/videos/city.mp4","../web/static/assets/videos/city.mp4"]]},"exportApplicationGlobal":true}};Object.defineProperty(exports, '__esModule', {value: true});return exports;
+  var exports = {'default': {"modulePrefix":"trainwhistle","environment":"development","rootURL":"/","locationType":"auto","EmberENV":{"FEATURES":{}},"APP":{"name":"trainwhistle","version":"0.0.0+58f03de9"},"ember-simple-auth":{"authenticationRoute":"landing.log-in","routeAfterAuthentication":"product.dashboard","routeIfAlreadyAuthenticated":"product.dashboard"},"ember-cli-post-build-copy":{"replace":true,"verbose":false,"development":[["/assets/vendor.js","../web/static/vendor/vendor.js"],["/assets/trainwhistle.js","../web/static/vendor/trainwhistle.js"],["/assets/vendor.css","../web/static/css/vendor.css"],["/assets/trainwhistle.css","../web/static/css/trainwhistle.css"],["/images/city-poster.jpg","../web/static/assets/images/city-poster.jpg"],["/images/favicon.png","../web/static/assets/images/favicon.png"],["/images/logo-color.svg","../web/static/assets/images/logo-color.svg"],["/images/logo-icon-white.svg","../web/static/assets/images/logo-icon-white.svg"],["/images/logo.svg","../web/static/assets/images/logo.svg"],["/videos/city.mp4","../web/static/assets/videos/city.mp4"]]},"exportApplicationGlobal":true}};Object.defineProperty(exports, '__esModule', {value: true});return exports;
 });
 
 /* jshint ignore:end */
@@ -2380,7 +3266,7 @@ define('trainwhistle/config/environment', ['ember'], function(Ember) {
 /* jshint ignore:start */
 
 if (!runningTests) {
-  require("trainwhistle/app")["default"].create({"name":"trainwhistle","version":"0.0.0+04aa2e5e"});
+  require("trainwhistle/app")["default"].create({"name":"trainwhistle","version":"0.0.0+58f03de9"});
 }
 
 /* jshint ignore:end */

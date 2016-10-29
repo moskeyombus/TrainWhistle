@@ -28,5 +28,6 @@ erl_crash.dump
 
 # assets
 /web/static/vendor
+/web/static/css
 /web/static/assets/images
 /web/static/assets/videos
