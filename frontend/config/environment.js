@@ -49,10 +49,7 @@ module.exports = function(environment) {
 
   }
 
-  ENV['ember-cli-post-build-copy'] = {
-    "replace": true,
-    "verbose": false,
-    "development": [
+  var copyPaths = [
       ['/assets/vendor.js','../web/static/vendor/vendor.js'],
       ['/assets/trainwhistle.js','../web/static/vendor/trainwhistle.js'],
       ['/assets/vendor.css','../web/static/css/vendor.css'],
@@ -63,7 +60,13 @@ module.exports = function(environment) {
       ['/images/logo-icon-white.svg', '../web/static/assets/images/logo-icon-white.svg'],
       ['/images/logo.svg', '../web/static/assets/images/logo.svg'],
       ['/videos/city.mp4', '../web/static/assets/videos/city.mp4'],
-    ]
+    ];
+
+  ENV['ember-cli-post-build-copy'] = {
+    "replace": true,
+    "verbose": false,
+    "development": copyPaths,
+    "production": copyPaths
   };
 
   return ENV;

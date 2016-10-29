@@ -8,9 +8,11 @@
     "test": "tests"
   },
   "scripts": {
-    "build": "ember build",
+    "build": "ember build --environment development",
     "start": "ember server",
-    "test": "ember test"
+    "test": "ember test",
+    "bower": "bower install",
+    "postinstall": "npm run bower && npm run build"
   },
   "repository": "",
   "engines": {
@@ -60,5 +62,8 @@
     "loader.js": "^4.0.1",
     "node-sass": "3.8.0",
     "postcss": "5.1.2"
+  },
+  "dependencies": {
+    "bower": "^1.7.9"
   }
 }
