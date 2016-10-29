@@ -3,7 +3,7 @@ defmodule TrainWhistle.AlarmTest do
 
   alias TrainWhistle.Alarm
 
-  @valid_attrs %{end_time: %{hour: 14, min: 0, sec: 0}, last_notified: %{day: 17, hour: 14, min: 0, month: 4, sec: 0, year: 2010}, start_time: %{hour: 14, min: 0, sec: 0}, travel_time: 42, name: "my first alarm", direction: "w", line: "blue"}
+  @valid_attrs %{end_time: %{hour: 14, min: 0, sec: 0}, last_notified: %{day: 17, hour: 14, min: 0, month: 4, sec: 0, year: 2010}, start_time: %{hour: 14, min: 0, sec: 0}, travel_time: 42, name: "my first alarm", direction: "w", line: "blue", user_id: 3}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

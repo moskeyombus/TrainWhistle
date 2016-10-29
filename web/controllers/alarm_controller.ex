@@ -2,14 +2,17 @@ defmodule TrainWhistle.AlarmController do
   use TrainWhistle.Web, :controller
 
   alias TrainWhistle.Alarm
+  alias TrainWhistle.Repo
 
   def index(conn, _params) do
-    alarms = Repo.all(Alarm)
-    render(conn, "index.json", alarms: alarms)
+    user = Guardian.Plug.current_resource(conn)
+    |> Repo.preload(:alarms)
+    render(conn, "index.json", alarms: user.alarms)
   end
 
-  def create(conn, %{"alarm" => alarm_params}) do
-    changeset = Alarm.changeset(%Alarm{}, alarm_params)
+  def create(conn, alarm_params) do
+    user = Guardian.Plug.current_resource(conn)
+    changeset = Alarm.changeset %Alarm{}, Map.put(alarm_params, "user_id", user.id)
 
     case Repo.insert(changeset) do
       {:ok, alarm} ->
@@ -24,13 +27,15 @@ defmodule TrainWhistle.AlarmController do
   end
 
   def show(conn, %{"id" => id}) do
-    alarm = Repo.get!(Alarm, id)
+    user = Guardian.Plug.current_resource(conn)
+    alarm = Repo.get_by!(Alarm, id: id, user_id: user.id)
     render(conn, "show.json", alarm: alarm)
   end
 
-  def update(conn, %{"id" => id, "alarm" => alarm_params}) do
-    alarm = Repo.get!(Alarm, id)
-    changeset = Alarm.changeset(alarm, alarm_params)
+  def update(conn, alarm_params = %{"id" => id}) do
+    user = Guardian.Plug.current_resource(conn)
+    alarm = Repo.get_by!(Alarm, id: id, user_id: user.id)
+    changeset = Alarm.changeset alarm, alarm_params
 
     case Repo.update(changeset) do
       {:ok, alarm} ->
@@ -43,7 +48,8 @@ defmodule TrainWhistle.AlarmController do
   end
 
   def delete(conn, %{"id" => id}) do
-    alarm = Repo.get!(Alarm, id)
+    user = Guardian.Plug.current_resource(conn)
+    alarm = Repo.get_by!(Alarm, id: id, user_id: user.id)
 
     # Here we use delete! (with a bang) because we expect
     # it to always work (and if it does not, it will raise).

@@ -1,7 +1,7 @@
 defmodule TrainWhistle.Location do
   use TrainWhistle.Web, :model
 
-  schema "location" do
+  schema "locations" do
     field :name, :string
 
     timestamps()

@@ -22,7 +22,7 @@ defmodule TrainWhistle.Alarm do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:start_time, :end_time, :travel_time, :last_notified, :name, :direction, :line])
-    |> validate_required([:start_time, :end_time, :travel_time, :last_notified, :name, :direction, :line])
+    |> cast(params, [:start_time, :end_time, :travel_time, :last_notified, :name, :direction, :line, :user_id])
+    |> validate_required([:start_time, :end_time, :travel_time, :last_notified, :name, :direction, :line, :user_id])
   end
 end

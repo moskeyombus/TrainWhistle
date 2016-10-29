@@ -2,7 +2,8 @@ defmodule TrainWhistle.AlarmControllerTest do
   use TrainWhistle.ConnCase
 
   alias TrainWhistle.Alarm
-  @valid_attrs %{name: "myalarm", end_time: %{hour: 14, min: 0, sec: 0}, last_notified: %{day: 17, hour: 14, min: 0, month: 4, sec: 0, year: 2010}, start_time: %{hour: 14, min: 0, sec: 0}, travel_time: 42}
+  @required_attrs %{name: "tempname", direction: "north", line: "red"}
+  @valid_attrs @required_attrs |> Map.merge(%{end_time: %{hour: 14, min: 0, sec: 0}, last_notified: %{day: 17, hour: 14, min: 0, month: 4, sec: 0, year: 2010}, start_time: %{hour: 14, min: 0, sec: 0}, travel_time: 42})
   @invalid_attrs %{}
 
   setup %{conn: conn} do
@@ -14,8 +15,8 @@ defmodule TrainWhistle.AlarmControllerTest do
     assert json_response(conn, 200) == []
   end
 
-  test "shows chosen resource", %{conn: conn} do
-    alarm = Repo.insert! %Alarm{name: "myalarm"}
+  test "shows chosen resource", %{conn: conn, user: user} do
+    alarm = Repo.insert!(Map.merge(%Alarm{user_id: user.id}, @required_attrs))
     conn = get conn, private_alarm_path(conn, :show, alarm)
     assert json_response(conn, 200) == %{"id" => alarm.id,
       "start_time" => alarm.start_time,
@@ -31,32 +32,32 @@ defmodule TrainWhistle.AlarmControllerTest do
     end
   end
 
-  test "creates and renders resource when data is valid", %{conn: conn} do
-    conn = post conn, private_alarm_path(conn, :create), alarm: @valid_attrs
+  test "creates and renders resource when data is valid", %{conn: conn, user: user} do
+    conn = post conn, private_alarm_path(conn, :create), Map.merge(@valid_attrs, %{user_id: user.id})
     assert json_response(conn, 201)["id"]
     assert Repo.get_by(Alarm, @valid_attrs)
   end
 
   test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-    conn = post conn, private_alarm_path(conn, :create), alarm: @invalid_attrs
+    conn = post conn, private_alarm_path(conn, :create), @invalid_attrs
     assert json_response(conn, 422)["errors"] != %{}
   end
 
-  test "updates and renders chosen resource when data is valid", %{conn: conn} do
-    alarm = Repo.insert! %Alarm{name: "somealarm"}
-    conn = put conn, private_alarm_path(conn, :update, alarm), alarm: @valid_attrs
+  test "updates and renders chosen resource when data is valid", %{conn: conn, user: user} do
+    alarm = Repo.insert!(Map.merge(%Alarm{user_id: user.id}, @required_attrs))
+    conn = put conn, private_alarm_path(conn, :update, alarm), @valid_attrs
     assert json_response(conn, 200)["id"]
     assert Repo.get_by(Alarm, @valid_attrs)
   end
 
-  test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-    alarm = Repo.insert! %Alarm{name: "somealarm"}
-    conn = put conn, private_alarm_path(conn, :update, alarm), alarm: @invalid_attrs
+  test "does not update chosen resource and renders errors when data is invalid", %{conn: conn, user: user} do
+    alarm = Repo.insert!(Map.merge(%Alarm{user_id: user.id}, @required_attrs))
+    conn = put conn, private_alarm_path(conn, :update, alarm), @invalid_attrs
     assert json_response(conn, 422)["errors"] != %{}
   end
 
-  test "deletes chosen resource", %{conn: conn} do
-    alarm = Repo.insert! %Alarm{name: "somealarm"}
+  test "deletes chosen resource", %{conn: conn, user: user} do
+    alarm = Repo.insert!(Map.merge(%Alarm{user_id: user.id}, @required_attrs))
     conn = delete conn, private_alarm_path(conn, :delete, alarm)
     assert response(conn, 204)
     refute Repo.get(Alarm, alarm.id)
