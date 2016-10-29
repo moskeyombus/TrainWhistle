@@ -6,8 +6,11 @@ defmodule TrainWhistle.Arrivals do
   end
 
   def parsed_arrivals do
-    { :ok, resp } = arrivals
-    Poison.Parser.parse! resp.body
+    case arrivals do
+      { :ok, resp } -> Poison.Parser.parse! resp.body
+      # not sure what to do with this...
+      { err, _ } -> err
+    end
   end
 
   def next_arrival(lat, long, direction) do
