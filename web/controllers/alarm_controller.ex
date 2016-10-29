@@ -12,7 +12,7 @@ defmodule TrainWhistle.AlarmController do
 
   def create(conn, %{"alarm" => alarm_params}) do
     user = Guardian.Plug.current_resource(conn)
-    changeset = Alarm.changeset %Alarm{}, Map.put(alarm_params, "user_id", user.id)
+    changeset = Alarm.changeset %Alarm{user_id: user.id}, alarm_params
 
     case Repo.insert(changeset) do
       {:ok, alarm} ->

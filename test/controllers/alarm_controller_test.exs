@@ -18,12 +18,8 @@ defmodule TrainWhistle.AlarmControllerTest do
   test "shows chosen resource", %{conn: conn, user: user} do
     alarm = Repo.insert!(Map.merge(%Alarm{user_id: user.id}, @required_attrs))
     conn = get conn, private_alarm_path(conn, :show, alarm)
-    assert json_response(conn, 200)["alarm"] == %{"id" => alarm.id,
-      "start_time" => alarm.start_time,
-      "end_time" => alarm.end_time,
-      "travel_time" => alarm.travel_time,
-      "last_notified" => alarm.last_notified,
-      "start_location_id" => alarm.start_location_id}
+    res = json_response(conn, 200)["alarm"]
+    assert res["id"] === alarm.id
   end
 
   test "renders page not found when id is nonexistent", %{conn: conn} do
@@ -32,10 +28,10 @@ defmodule TrainWhistle.AlarmControllerTest do
     end
   end
 
-  test "creates and renders resource when data is valid", %{conn: conn} do
+  test "creates and renders resource when data is valid", %{conn: conn, user: user} do
     conn = post conn, private_alarm_path(conn, :create), %{alarm: @valid_attrs}
     assert json_response(conn, 201)["alarm"]["id"]
-    assert Repo.get_by(Alarm, @valid_attrs)
+    assert Repo.get_by(Alarm, user_id: user.id)
   end
 
   test "does not create resource and renders errors when data is invalid", %{conn: conn} do
@@ -47,7 +43,7 @@ defmodule TrainWhistle.AlarmControllerTest do
     alarm = Repo.insert!(Map.merge(%Alarm{user_id: user.id}, @required_attrs))
     conn = put conn, private_alarm_path(conn, :update, alarm), %{alarm: @valid_attrs}
     assert json_response(conn, 200)["alarm"]["id"]
-    assert Repo.get_by(Alarm, @valid_attrs)
+    assert Repo.get_by(Alarm, user_id: user.id)
   end
 
   test "does not update chosen resource and renders errors when data is invalid", %{conn: conn, user: user} do
