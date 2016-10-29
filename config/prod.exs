@@ -38,6 +38,9 @@ config :quantum, cron: [
   "* * * * *": {Mix.Tasks.TrainWhistle.Poller, :poll}
 ]
 
+config :guardian, Guardian,
+  secret_key: System.get_env("GUARDIAN_KEY")
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
