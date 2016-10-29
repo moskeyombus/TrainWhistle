@@ -1,7 +1,11 @@
 .row
   .col
     .dialog-box
-      h1 My Alarms
+      h1
+        | My Alarms
+        button.btn.btn-sm.btn-primary.pull-right.static-size click='addAlarm'
+          i.fa.fa-bell &nbsp;
+          | Add Alarm
       p Set an alarm to let you know when you need to leave your home to reach MARTA in time to get work. We'll check on all the trains and make sure to notify you early enough that you're always on time.
       hr
       = alarm-item

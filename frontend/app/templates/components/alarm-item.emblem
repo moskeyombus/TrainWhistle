@@ -1,5 +1,17 @@
 if inEditMode
-  button click='show' show
+  .form-field
+    label Alarm Name
+    = input type='text' autocapitalize='words' autocorrect='on' name='name' placeholder='My Alarm' required=true inputmode='latin-name' value=alarm.name
+  .fields-row
+    .form-field
+      label Start Time
+      = input type='time' value=alarm.start_time
+    .form-field
+      label End Time
+      = input type='time' value=alarm.end_time
+  .buttons-row
+    button.btn.btn-ghost-default.btn-sm click='show' Cancel
+    button.btn.btn-success.btn-sm click='save' Save Alarm
 else
   h3
     | Morning Wake Up Call - 
@@ -11,4 +23,6 @@ else
     | &nbsp; | &nbsp;
     i.fa.fa-calendar &nbsp; 
     | M, W, F
-  button click='edit' edit
+    a.pull-right click='edit'
+      i.fa.fa-pencil &nbsp;
+      | Edit

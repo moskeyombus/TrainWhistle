@@ -24,6 +24,10 @@ button.btn, a.btn, .btn {
   &.btn-sm {
     padding: .625em 0.85em;
     font-size: .85em;
+
+    &.static-size {
+      font-size: 14px;
+    }
   }
 
   &.btn-lg {

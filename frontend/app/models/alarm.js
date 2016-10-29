@@ -1,6 +1,7 @@
 import DS from 'ember-data';
 
 export default DS.Model.extend({
+  start_location: DS.belongsTo('location', {inverse: null}),
   start_time: DS.attr('date'),
   end_time: DS.attr('date'),
   last_notified: DS.attr('date'),

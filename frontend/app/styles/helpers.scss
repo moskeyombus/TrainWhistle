@@ -61,6 +61,7 @@
 
 @mixin link-root($color, $no-decoration:true) {
   color: $color;
+  cursor: pointer;
   transition: color 0.25s ease;
 
   &:hover {

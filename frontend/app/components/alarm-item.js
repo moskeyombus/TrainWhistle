@@ -5,6 +5,11 @@ export default Ember.Component.extend({
     edit() {
       this.set('mode', 'edit');
     },
+    save() {
+      this.get('alarm').save().then(() => {
+        this.set('mode', 'show')
+      });
+    },
     show() {
       this.set('mode', 'show');
     }
