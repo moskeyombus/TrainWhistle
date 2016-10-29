@@ -1,0 +1,28 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": [],
+      "method": "get",
+      "options": [],
+      "request_body": "",
+      "url": "http://marta-api.herokuapp.com/arrivals"
+    },
+    "response": {
+      "body": "[]",
+      "headers": {
+        "Server": "Cowboy",
+        "Connection": "keep-alive",
+        "Vary": "origin",
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-cache",
+        "Content-Length": "20817",
+        "Accept-Ranges": "bytes",
+        "Date": "Sat, 29 Oct 2016 05:24:32 GMT",
+        "Via": "1.1 vegur"
+      },
+      "status_code": 500,
+      "type": "fail"
+    }
+  }
+]

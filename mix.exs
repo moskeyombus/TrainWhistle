@@ -9,6 +9,9 @@ defmodule TrainWhistle.Mixfile do
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     preferred_cli_env: [
+       vcr: :test, "vcr.delete": :test, "vcr.check": :test, "vcr.show": :test
+     ],
      aliases: aliases(),
      deps: deps()]
   end
@@ -19,7 +22,7 @@ defmodule TrainWhistle.Mixfile do
   def application do
     [mod: {TrainWhistle, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex, :comeonin]]
+                    :phoenix_ecto, :postgrex, :httpoison, :comeonin]]
   end
 
   # Specifies which paths to compile per environment.
@@ -36,7 +39,9 @@ defmodule TrainWhistle.Mixfile do
      {:postgrex, ">= 0.0.0"},
      {:phoenix_html, "~> 2.6"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
+     {:exvcr, "~> 0.7", only: :test},
      {:gettext, "~> 0.11"},
+     {:httpoison, "~> 0.9.0"},
      {:cowboy, "~> 1.0"},
      {:quantum, "~> 1.8.0"},
      {:guardian, "~> 0.13.0"},
