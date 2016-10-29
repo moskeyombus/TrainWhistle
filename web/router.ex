@@ -41,6 +41,7 @@ defmodule TrainWhistle.Router do
       resources "/alarms", AlarmController, except: [:new, :edit]
       resources "/locations", LocationController, only: [:index, :show]
       get "/users", UserController, :index
+      patch "/users/:id", UserController, :update
     end
   end
 end
