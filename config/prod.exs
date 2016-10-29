@@ -20,11 +20,11 @@ config :train_whistle, TrainWhistle.Endpoint,
 
 config :train_whistle, TrainWhistle.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: System.get_env("DATABASE_USER"),
-  password: System.get_env("DATABASE_PASSWORD"),
-  database: System.get_env("DATABASE_NAME"),
-  hostname: System.get_env("DATABASE_URL"),
-  pool_size: 10
+  username:  System.get_env("DATABASE_USER"),
+  password:  System.get_env("DATABASE_PASSWORD"),
+  database:  System.get_env("DATABASE_NAME"),
+  hostname:  System.get_env("DATABASE_URL"),
+  pool_size: System.get_env("POOL_SIZE")
 
 # Do not print debug messages in production
 config :logger, level: :info
