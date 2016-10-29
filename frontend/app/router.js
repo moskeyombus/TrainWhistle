@@ -11,6 +11,19 @@ Router.map(function() {
     this.route('log-in', {path: '/'});
     this.route('sign-up', {path: 'sign-up'});
   });
+  this.route('product', {path:'/product'}, function() {
+    this.route('dashboard');
+    this.route('alarms', function() {
+      this.route('edit');
+      this.route('index', {path: '/'});
+      this.route('new');
+      this.route('show');
+    });
+    this.route('profile', function() {
+      this.route('show', {path: '/'});
+      this.route('edit');
+    });
+  });
 });
 
 export default Router;

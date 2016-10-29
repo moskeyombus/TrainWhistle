@@ -1,0 +1,54 @@
+header {
+  align-items: center;
+  box-shadow: 0 0 15px rgba(0,0,0,0.15);
+  display: flex;
+  height: 64px;
+  justify-content: flex-start;
+
+  .home-link {
+    align-items: center;
+    background: $brand-primary;
+    display: flex;
+    height: 64px;
+    justify-content: center;
+    margin-right: 15px;
+    transition: background 0.4s ease;
+    width: 64px;
+
+    &:hover, &:focus {
+      background: lighten($brand-primary, 10%);
+    }
+  }
+}
+
+nav {
+  align-items: stretch;
+  display: flex;
+  justify-content: flex-start;
+
+  a {
+    @include link-root($main-header-text-color);
+
+    padding: 0 20px;
+    transition: color 0.4s ease;
+    
+    &:after {
+      background: $brand-primary;
+      content: "";
+      display: block;
+      height: 3px;
+      margin: 5px 0 -5px 50%;
+      transition: background 0.25s ease, margin-left 0.25s ease, width 0.25s ease;
+      width: 0%;
+    }
+
+    &:hover:after {
+      background: lighten($brand-primary, 10%);
+    }
+
+    &:hover:after, &.active:after {
+      margin-left: 0%;
+      width: 100%;
+    }
+  }
+}
