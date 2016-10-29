@@ -46,4 +46,6 @@ config :guardian, Guardian,
   secret_key: "somuchverysecretkeywow"
 
 
-import_config "dev.secret.exs"
+if File.exists? "config/dev.secret.exs" do
+  import_config "dev.secret.exs"
+end
