@@ -22,7 +22,7 @@ defmodule TrainWhistle.Mixfile do
   def application do
     [mod: {TrainWhistle, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex, :httpoison, :comeonin]]
+                    :phoenix_ecto, :postgrex, :httpoison, :comeonin, :ex_twilio]]
   end
 
   # Specifies which paths to compile per environment.
@@ -45,7 +45,8 @@ defmodule TrainWhistle.Mixfile do
      {:cowboy, "~> 1.0"},
      {:quantum, "~> 1.8.0"},
      {:guardian, "~> 0.13.0"},
-     {:comeonin, "~> 2.5"}]
+     {:comeonin, "~> 2.5"},
+     {:ex_twilio, "~> 0.2.0"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

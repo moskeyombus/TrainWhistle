@@ -2,7 +2,7 @@
 
 ## Setup
 
-- Copy config/copy.to.dev.secret.exs to config/dev.secret.exs, and set your DB credentials
+- Copy config/copy.to.dev.secret.exs to config/dev.secret.exs, and set your DB and Twilio credentials
 
 To start your Phoenix app:
 
