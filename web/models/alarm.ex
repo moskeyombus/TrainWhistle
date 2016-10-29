@@ -2,6 +2,9 @@ defmodule TrainWhistle.Alarm do
   use TrainWhistle.Web, :model
   use Timex.Ecto.Timestamps
 
+  alias TrainWhistle.Location
+  alias TrainWhistle.Repo
+
   schema "alarms" do
     field :start_time, Timex.Ecto.Time
     field :end_time, Timex.Ecto.Time

@@ -2,6 +2,7 @@ defmodule TrainWhistle.AlarmController do
   use TrainWhistle.Web, :controller
 
   alias TrainWhistle.Alarm
+  alias TrainWhistle.Location
   alias TrainWhistle.Repo
 
   def index(conn, _params) do
@@ -11,8 +12,9 @@ defmodule TrainWhistle.AlarmController do
   end
 
   def create(conn, %{"alarm" => alarm_params}) do
+    location = Repo.get!(Location, alarm_params["start_location"])
     user = Guardian.Plug.current_resource(conn)
-    changeset = Alarm.changeset %Alarm{user_id: user.id}, alarm_params
+    changeset = Alarm.changeset %Alarm{user_id: user.id, start_location_id: location.id}, alarm_params
 
     case Repo.insert(changeset) do
       {:ok, alarm} ->
@@ -33,9 +35,10 @@ defmodule TrainWhistle.AlarmController do
   end
 
   def update(conn, %{"id" => id, "alarm" => alarm_params }) do
+    location = Repo.get(Location, alarm_params["start_location"])
     user = Guardian.Plug.current_resource(conn)
     alarm = Repo.get_by!(Alarm, id: id, user_id: user.id)
-    changeset = Alarm.changeset alarm, alarm_params
+    changeset = Alarm.changeset Map.put(alarm, :start_location_id, location.id), alarm_params
 
     case Repo.update(changeset) do
       {:ok, alarm} ->
