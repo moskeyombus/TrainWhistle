@@ -1,0 +1,7 @@
+.fa-huge {
+  font-size: 180px;
+
+  @media (max-width: $screen-xs-max) {
+    font-size: 120px;
+  }
+}

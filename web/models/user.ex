@@ -7,6 +7,8 @@ defmodule TrainWhistle.User do
     field :password_hash, :string
     field :phone, :string
     field :password, :string, virtual: true
+    field :first_name, :string
+    field :last_name, :string
 
     # Associations
     has_many :alarms, TrainWhistle.Alarm
@@ -19,7 +21,9 @@ defmodule TrainWhistle.User do
   returning the user entity if successful
   """
   def authenticate(params) do
-    user = Repo.get_by(__MODULE__, email: params["email"])
+
+    # Opt for using username here since it's what the OAuth standard asks for.
+    user = Repo.get_by(__MODULE__, email: params["username"])
     case check_pw(user, params["password"]) do
       true -> {:ok, user}
       _    -> :error
@@ -38,7 +42,7 @@ defmodule TrainWhistle.User do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:email, :phone])
+    |> cast(params, [:email, :phone, :first_name, :last_name])
     |> validate_required([:email, :phone])
     |> validate_length(:email, min: 3, max: 255)
     |> validate_format(:email, ~r/@/, message: "not a valid email.")

@@ -1,0 +1,5 @@
+.content-dialog
+  .dialog-box
+    = outlet
+.video-underlay
+  video src='/videos/city.mp4' autoplay=true autostart=true poster='/images/city-poster.jpg' preload='auto' loop=true

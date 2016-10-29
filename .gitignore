@@ -24,3 +24,10 @@ erl_crash.dump
 /config/prod.secret.exs
 /config/dev.secret.exs
 /config/test.secret.exs
+.DS_Store
+
+# assets
+/web/static/vendor
+/web/static/css
+/web/static/assets/images
+/web/static/assets/videos
