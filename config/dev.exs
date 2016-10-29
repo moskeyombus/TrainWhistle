@@ -41,7 +41,3 @@ config :train_whistle, TrainWhistle.Repo,
   database: "train_whistle_dev",
   hostname: "localhost",
   pool_size: 10
-
-config :quauntum, cron: [
-  "* * * * *": {Mix.Tasks.TrainWhisle, :poll}
-]
