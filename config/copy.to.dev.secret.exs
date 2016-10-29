@@ -7,7 +7,12 @@ config :train_whistle, TrainWhistle.Repo,
   password: "",
   database: "train_whistle_dev",
   hostname: "localhost",
-  twilioSid: "",
-  twilioAuth: "",
-  twilioNumber: "+15005550006", 
   pool_size: 10
+
+# Configure ExTwilio
+config :ex_twilio,
+  account_sid: ""
+  auth_token:  ""
+
+config :train_whistle, TrainWhistle,
+  twilio_number: ""

@@ -32,13 +32,6 @@ config :guardian, Guardian,
   secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
   serializer: TrainWhistle.GuardianSerializer
 
-# Configure ExTwilio
-config :ex_twilio,
-  account_sid: System.get_env("TWILIO_ACCOUNT_SID") || "${TWILIO_ACCOUNT_SID}",
-  auth_token:  System.get_env("TWILIO_AUTH_TOKEN") || "${TWILIO_AUTH_TOKEN}"
-
-config :train_whistle, TrainWhistle,
-  twilio_number: System.get_env("TWILIO_NUMBER") || "${TWILIO_NUMBER}"
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
