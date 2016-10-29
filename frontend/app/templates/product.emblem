@@ -2,7 +2,6 @@ header
   = link-to 'product.profile' class='home-link'
     img src='/images/logo-icon-white.svg' width=45
   nav
-    = link-to 'product.dashboard' | Dashboard
     = link-to 'product.alarms' | Alarms
     = link-to 'product.profile' | Profile
 main
