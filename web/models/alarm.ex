@@ -2,10 +2,10 @@ defmodule TrainWhistle.Alarm do
   use TrainWhistle.Web, :model
 
   schema "alarms" do
-    field :start_time, Ecto.Time
-    field :end_time, Ecto.Time
+    field :start_time, Timex.Ecto.Time
+    field :end_time, Timex.Ecto.Time
     field :travel_time, :integer
-    field :last_notified, Ecto.DateTime
+    field :last_notified, Timex.Ecto.DateTime
     field :name, :string
     field :direction, :string
     field :line, :string

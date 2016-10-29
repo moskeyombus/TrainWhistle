@@ -22,7 +22,7 @@ defmodule TrainWhistle.Mixfile do
   def application do
     [mod: {TrainWhistle, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex, :httpoison, :comeonin, :ex_twilio]]
+                    :phoenix_ecto, :postgrex, :httpoison, :comeonin, :quantum, :timex_ecto, :ex_twilio]]
   end
 
   # Specifies which paths to compile per environment.
@@ -42,6 +42,7 @@ defmodule TrainWhistle.Mixfile do
      {:exvcr, "~> 0.7", only: :test},
      {:gettext, "~> 0.11"},
      {:httpoison, "~> 0.9.0"},
+     {:timex_ecto, "~> 3.0"},
      {:cowboy, "~> 1.0"},
      {:quantum, "~> 1.8.0"},
      {:guardian, "~> 0.13.0"},
