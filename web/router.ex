@@ -38,6 +38,8 @@ defmodule TrainWhistle.Router do
       pipe_through :authenticated
 
       get "/me", UserController, :me
+      resources "/alarms", AlarmController, except: [:new, :edit]
+      resources "/locations", LocationController, only: [:index, :show]
     end
   end
 end

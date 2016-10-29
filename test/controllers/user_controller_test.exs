@@ -7,12 +7,7 @@ defmodule TrainWhistle.UserControllerTest do
   @invalid_attrs %{}
 
   setup %{conn: conn} do
-    hash = Comeonin.Bcrypt.hashpwsalt("pass")
-    {:ok, user} = Repo.insert %User{password_hash: hash, email: "me@mail.com"}
-    {:ok, jwt, full_claims} = Guardian.encode_and_sign(user)
-    json_conn = conn |> put_req_header("accept", "application/json")
-
-    {:ok, %{conn: json_conn, user: user, jwt: jwt, claims: full_claims }}
+    conn |> TrainWhistle.TestHelper.auth_setup
   end
 
   test "creates and renders resource when data is valid", %{conn: conn} do
