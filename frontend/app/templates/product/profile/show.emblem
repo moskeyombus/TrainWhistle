@@ -31,4 +31,4 @@
             = missing-field field='Phone' location='product.profile.edit'
     hr.spacer
     = link-to 'product.profile.edit' class='btn btn-primary btn-sm' | Edit My Profile
-  .col.imaged.full-page.hidden-xs style="background-image: url('/images/marta-station.jpg');"
+  .col.imaged.full-page-right.hidden-xs style="background-image: url('/images/marta-station.jpg');"
