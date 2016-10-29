@@ -1,0 +1,34 @@
+= title "My Profile"
+.row.align-stretch.flex-grow
+  .col
+    h1 My Profile
+    p Here's the contact information we currently have on file for you:
+    .box
+      ul.details-list
+        li
+          .label
+            i.fa.fa-user
+            | Name
+          if model.user.name
+            .value= model.user.name
+          else
+            = missing-field field='Name' location='product.profile.edit'
+        li
+          .label
+            i.fa.fa-envelope-o
+            | Email Address
+          if model.user.email
+            .value= model.user.email
+          else
+            = missing-field field='Email' location='product.profile.edit'
+        li
+          .label
+            i.fa.fa-phone
+            | Phone Number
+          if model.user.phone
+            .value= model.user.phone
+          else
+            = missing-field field='Phone' location='product.profile.edit'
+    hr.spacer
+    = link-to 'product.profile.edit' class='btn btn-primary btn-sm' | Edit My Profile
+  .col.imaged.full-page.hidden-xs style="background-image: url('/images/marta-station.jpg');"
