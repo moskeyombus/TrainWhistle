@@ -50,17 +50,20 @@ module.exports = function(environment) {
   }
 
   var copyPaths = [
-      ['/assets/vendor.js','../web/static/vendor/vendor.js'],
-      ['/assets/trainwhistle.js','../web/static/vendor/trainwhistle.js'],
-      ['/assets/vendor.css','../web/static/css/vendor.css'],
-      ['/assets/trainwhistle.css','../web/static/css/trainwhistle.css'],
-      ['/images/city-poster.jpg', '../web/static/assets/images/city-poster.jpg'],
-      ['/images/favicon.png', '../web/static/assets/images/favicon.png'],
-      ['/images/logo-color.svg', '../web/static/assets/images/logo-color.svg'],
-      ['/images/logo-icon-white.svg', '../web/static/assets/images/logo-icon-white.svg'],
-      ['/images/logo.svg', '../web/static/assets/images/logo.svg'],
-      ['/videos/city.mp4', '../web/static/assets/videos/city.mp4'],
-    ];
+    ['/assets/vendor.js','../web/static/vendor/vendor.js'],
+    ['/assets/trainwhistle.js','../web/static/vendor/trainwhistle.js'],
+    ['/assets/vendor.css','../web/static/css/vendor.css'],
+    ['/assets/trainwhistle.css','../web/static/css/trainwhistle.css'],
+    ['/images/city-poster.jpg', '../web/static/assets/images/city-poster.jpg'],
+    ['/images/favicon.png', '../web/static/assets/images/favicon.png'],
+    ['/images/logo-color.svg', '../web/static/assets/images/logo-color.svg'],
+    ['/images/logo-icon-white.svg', '../web/static/assets/images/logo-icon-white.svg'],
+    ['/images/logo.svg', '../web/static/assets/images/logo.svg'],
+    ['/images/marta-station.jpg', '../web/static/assets/images/marta-station.jpg'],
+    ['/images/marta-train.jpg', '../web/static/assets/images/marta-train.jpg'],
+    ['/images/logo.svg', '../web/static/assets/images/logo.svg'],
+    ['/videos/city.mp4', '../web/static/assets/videos/city.mp4'],
+  ];
 
   ENV['ember-cli-post-build-copy'] = {
     "replace": true,
