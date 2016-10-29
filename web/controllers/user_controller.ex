@@ -17,7 +17,7 @@ defmodule TrainWhistle.UserController do
     end
   end
 
-  def me(conn, _params) do
+  def index(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
     conn |> render("show.json", user: user)
   end

@@ -37,7 +37,7 @@ defmodule TrainWhistle.Router do
     scope as: :private do
       pipe_through :authenticated
 
-      get "/me", UserController, :me
+      get "/users", UserController, :index
       resources "/alarms", AlarmController, except: [:new, :edit]
       resources "/locations", LocationController, only: [:index, :show]
       get "/users", UserController, :index
