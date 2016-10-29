@@ -2,11 +2,11 @@ defmodule TrainWhistle.AlarmView do
   use TrainWhistle.Web, :view
 
   def render("index.json", %{alarms: alarms}) do
-    render_many(alarms, TrainWhistle.AlarmView, "alarm.json")
+    %{alarms: render_many(alarms, TrainWhistle.AlarmView, "alarm.json")}
   end
 
   def render("show.json", %{alarm: alarm}) do
-    render_one(alarm, TrainWhistle.AlarmView, "alarm.json")
+    %{alarm: render_one(alarm, TrainWhistle.AlarmView, "alarm.json")}
   end
 
   def render("alarm.json", %{alarm: alarm}) do

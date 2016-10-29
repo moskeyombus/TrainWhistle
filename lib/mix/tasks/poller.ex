@@ -4,6 +4,8 @@ defmodule Mix.Tasks.TrainWhistle.Poller do
   alias TrainWhistle.Alarm
   alias TrainWhistle.Repo
 
+  def run(_), do: false
+
   def poll do
     alarms = Repo.all(
       from p in Alarm,
@@ -20,7 +22,7 @@ defmodule Mix.Tasks.TrainWhistle.Poller do
     # find first matching arrival
     # TODO: name should be station name? go go go
     # TODO: time zones accurate? prob not
-    {d, t} = :calendar.universal_time
+    {_, t} = :calendar.universal_time
     now = Timex.Duration.from_time(Time.from_erl!(t))
     start_diff = abs(Timex.Duration.diff(alarm.start_time, now, :seconds))
     end_diff = abs(Timex.Duration.diff(alarm.end_time, now, :seconds))
@@ -28,8 +30,8 @@ defmodule Mix.Tasks.TrainWhistle.Poller do
     notify(alarm, match)
   end
 
-  def notify(alarm, { nil }), do: :ok
-  def notify(alarm, arrival) do
+  def notify(_alarm, { nil }), do: :ok
+  def notify(alarm, _arrival) do
     # make sure it doesn't get picked again up for this alarm today
     changeset = Alarm.changeset(alarm, %{last_notified: DateTime.utc_now})
     Repo.update!(changeset)
