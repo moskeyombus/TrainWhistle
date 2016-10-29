@@ -27,8 +27,9 @@ if inEditMode
     button.btn.btn-success.btn-sm click='save' Save Alarm
 else
   h3
-    | Morning Wake Up Call - 
-    span.text-danger.capitalize
+    = alarm.name
+    |  - 
+    span.capitalize
       = alarm.line
       | Line
     | , Five Points
@@ -41,3 +42,4 @@ else
     a.pull-right click='edit'
       i.fa.fa-pencil &nbsp;
       | Edit
+hr.spacer
