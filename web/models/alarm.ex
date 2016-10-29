@@ -6,6 +6,7 @@ defmodule TrainWhistle.Alarm do
     field :end_time, Ecto.Time
     field :travel_time, :integer
     field :last_notified, Ecto.DateTime
+    field :name, :string
     belongs_to :start_location, TrainWhistle.Location
 
     timestamps()
@@ -16,7 +17,7 @@ defmodule TrainWhistle.Alarm do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:start_time, :end_time, :travel_time, :last_notified])
-    |> validate_required([:start_time, :end_time, :travel_time, :last_notified])
+    |> cast(params, [:start_time, :end_time, :travel_time, :last_notified, :name])
+    |> validate_required([:start_time, :end_time, :travel_time, :last_notified, :name])
   end
 end
