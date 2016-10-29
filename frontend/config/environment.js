@@ -2,7 +2,7 @@
 
 module.exports = function(environment) {
   var ENV = {
-    modulePrefix: 'trainwhistle-ui',
+    modulePrefix: 'trainwhistle',
     environment: environment,
     rootURL: '/',
     locationType: 'auto',
