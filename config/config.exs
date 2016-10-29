@@ -17,6 +17,13 @@ config :train_whistle, TrainWhistle.Endpoint,
   pubsub: [name: TrainWhistle.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
+config :mime, :types, %{
+  "application/vnd.api+json" => ["json-api"]
+}
+
+config :phoenix, :format_encoders,
+  "json-api": Poison
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
