@@ -38,6 +38,7 @@ defmodule TrainWhistle.Router do
       pipe_through :authenticated
 
       get "/users", UserController, :index
+      patch "/users/:id", UserController, :update
     end
   end
 end
