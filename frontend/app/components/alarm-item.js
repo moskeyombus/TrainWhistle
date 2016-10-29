@@ -12,6 +12,13 @@ export default Ember.Component.extend({
     },
     show() {
       this.set('mode', 'show');
+    },
+    setLocation(selected){
+      var value; 
+      if (selected != null) {
+        value = selected.id;
+      }
+      this.alarm.set('start_location_id', value);
     }
   },
   classNames: ['alarm'],

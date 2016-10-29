@@ -18,6 +18,10 @@ if inEditMode
       label Direction
       = power-select-with-fallback options=directions verticalPosition='below' selected=alarm.direction allowClear=false placeholder='Select a direction' required=true onchange=(action (mut alarm.direction)) as |direction|
         span.capitalize= direction
+  .form-field
+    label Station
+    = power-select-with-fallback options=locations verticalPosition='below' selected=alarm.startLocation allowClear=false placeholder='Select a station' required=true onchange=(action 'setLocation') as |station|
+      span.capitalize= station.name
   .buttons-row
     button.btn.btn-ghost-default.btn-sm click='show' Cancel
     button.btn.btn-success.btn-sm click='save' Save Alarm
