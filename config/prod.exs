@@ -23,7 +23,7 @@ config :train_whistle, TrainWhistle.Repo,
   username:  System.get_env("DATABASE_USER"),
   password:  System.get_env("DATABASE_PASSWORD"),
   database:  System.get_env("DATABASE_NAME"),
-  hostname:  System.get_env("DATABASE_URL"),
+  url:       System.get_env("DATABASE_URL"),
   pool_size: System.get_env("POOL_SIZE")
 
 # Do not print debug messages in production
