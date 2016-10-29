@@ -1,4 +1,4 @@
-defmodule Twilio.Message do
+defmodule TrainWhistle.Message do
   @moduledoc """
   Represents an Message resource in the Twilio API.
   - [Twilio docs](https://www.twilio.com/docs/api/rest/messages)
