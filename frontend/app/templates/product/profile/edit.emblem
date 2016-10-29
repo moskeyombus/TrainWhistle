@@ -27,4 +27,4 @@
     .buttons-row
       = link-to 'product.profile.show' class='btn btn-ghost-default btn-sm' | Back
       = link-to 'product.profile.show' class='btn btn-success btn-sm btn-main' | Save Changes
-  .col.imaged.full-page.hidden-xs style="background-image: url('/images/marta-station.jpg');"
+  .col.imaged.full-page-right.hidden-xs style="background-image: url('/images/marta-station.jpg');"
