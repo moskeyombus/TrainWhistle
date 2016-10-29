@@ -35,6 +35,10 @@ config :ex_twilio,
   auth_token:  System.get_env("TWILIO_AUTH_TOKEN"),
   twilio_number: System.get_env("TWILIO_NUMBER")
 
+config :quantum, cron: [
+  "* * * * *": {Mix.Tasks.TrainWhistle.Poller, :poll}
+]
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

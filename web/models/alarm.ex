@@ -1,11 +1,12 @@
 defmodule TrainWhistle.Alarm do
   use TrainWhistle.Web, :model
+  use Timex.Ecto.Timestamps
 
   schema "alarms" do
-    field :start_time, Ecto.Time
-    field :end_time, Ecto.Time
+    field :start_time, Timex.Ecto.Time
+    field :end_time, Timex.Ecto.Time
     field :travel_time, :integer
-    field :last_notified, Ecto.DateTime
+    field :last_notified, Timex.Ecto.DateTime
     field :name, :string
     field :direction, :string
     field :line, :string
@@ -15,6 +16,15 @@ defmodule TrainWhistle.Alarm do
     belongs_to :user, TrainWhistle.User
 
     timestamps()
+  end
+
+  def human_direction(alarm) do
+    case alarm.direction do
+      "s" -> "south"
+      "n" -> "north"
+      "e" -> "east"
+      "w" -> "west"
+    end
   end
 
   @doc """
