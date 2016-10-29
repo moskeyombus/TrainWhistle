@@ -21,4 +21,6 @@ config :train_whistle, TrainWhistle.Repo,
 config :guardian, Guardian,
   secret_key: "somuchverysecretkeywow"
 
-import_config "test.secret.exs"
+if File.exists? "config/test.secret.exs" do
+  import_config "test.secret.exs"
+end
