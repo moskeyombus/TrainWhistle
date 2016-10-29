@@ -11,12 +11,15 @@ form
     .form-field
       label Last Name
       input placeholder='Doe' type='text' name='last_name' autocapitalize='words' autocorrect='off' autocomplete='family-name' inputmode='latin-name'
-  .form-field
+  .form-field.top-layer
+    label Phone Number
+    = intl-tel-input type='tel' autocapitalize='none' autocorrect='on' autocomplete='tel' name='phone' placeholder='+1 (555) 555-555' inputmode='tel'
+  .form-field.required
     label Email Address
     input placeholder='john.doe@example.com' type='email' name='email' autocapitalize='off' autocorrect='off' autocomplete='email' required=true inputmode='email'
-  .form-field
+  .form-field.required
     label Password
-    input placeholder='password' type='password' name='password'
+    input placeholder='password' type='password' name='password' required=true
   .form-field
     label Confirm Password
     input placeholder='password' type='password' name='password_confirmation'

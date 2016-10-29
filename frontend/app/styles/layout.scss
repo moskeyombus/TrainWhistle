@@ -1,5 +1,18 @@
 body {
   margin: 0;
+
+  &, & > .ember-view {
+    @include flex(column, nowrap, stretch, flex-start);
+
+    min-height: 100vh;
+  }
+}
+
+main {
+  @include flex(column, nowrap, stretch, flex-start);
+
+  flex: 1 0 auto;
+  padding: 2.5% 5%;
 }
 
 .content-dialog {
