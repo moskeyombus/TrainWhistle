@@ -6,7 +6,7 @@ defmodule TrainWhistle.Alarm do
     field :start_time, Timex.Ecto.Time
     field :end_time, Timex.Ecto.Time
     field :travel_time, :integer
-    field :last_notified, Timex.Ecto.DateTime
+    field :last_notified, Timex.Ecto.DateTime, default: DateTime.utc_now
     field :name, :string
     field :direction, :string
     field :line, :string
@@ -32,7 +32,7 @@ defmodule TrainWhistle.Alarm do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:start_time, :end_time, :travel_time, :last_notified, :name, :direction, :line, :user_id])
-    |> validate_required([:start_time, :end_time, :travel_time, :last_notified, :name, :direction, :line, :user_id])
+    |> cast(params, [:start_time, :end_time, :travel_time, :name, :direction, :line])
+    |> validate_required([:start_time, :end_time, :travel_time, :name, :direction, :line])
   end
 end
