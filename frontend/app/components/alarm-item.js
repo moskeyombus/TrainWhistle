@@ -18,7 +18,7 @@ export default Ember.Component.extend({
       if (selected != null) {
         value = selected.id;
       }
-      this.alarm.set('start_location_id', value);
+      this.alarm.set('start_location', value);
     }
   },
   classNames: ['alarm'],
