@@ -47,6 +47,22 @@ defmodule TrainWhistle.UserController do
     end
   end
 
+  def update(conn, params) do
+    attrs = JaSerializer.Params.to_attributes(params)
+    user = Repo.get!(User, params["id"])
+    changeset = User.changeset(user, attrs)
+    IO.write changeset
+
+    case Repo.update(changeset) do
+      {:ok, post} ->
+        render(conn, "show.json", user: user)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(TrainWhistle.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
   def unauthenticated(conn, _) do
     conn 
     |> put_status(:unauthorized)

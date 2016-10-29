@@ -3,7 +3,7 @@
   .col
     h1 Edit Profile
     p Feel free to edit the contact information below. You must provide your password to update it.
-    form
+    form submit='update'
       .fields-row
         .form-field
           label First Name

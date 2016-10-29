@@ -7,7 +7,7 @@ export default DS.Model.extend({
   phone: DS.attr('string'),
   email: DS.attr('string'),
   name: Ember.computed('first_name', 'last_name', function() {
-    let firstName = this.get('first_name'), lastName = this.get('first_name'), name = [];
+    let firstName = this.get('first_name'), lastName = this.get('last_name'), name = [];
 
     // Check for existence of first name; if it exists, add it to name array
     if (firstName != null && firstName !== "") {
