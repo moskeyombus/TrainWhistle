@@ -11,9 +11,9 @@
         .form-field
           label Last Name
           = input type='text' autocapitalize='words' autocorrect='off' autocomplete='family-name' name='name' placeholder='Doe' required=true inputmode='latin-name' value=sessionAccount.currentUser.last_name
-      .form-field
+      .form-field.required
         label Phone Number
-        = intl-tel-input type='tel' autocapitalize='none' autocorrect='on' autocomplete='tel' name='phone' placeholder='+1 (555) 555-555' inputmode='tel' value=sessionAccount.currentUser.phone
+        = intl-tel-input type='tel' autocapitalize='none' autocorrect='on' autocomplete='tel' name='phone' placeholder='+1 (555) 555-555' required=true inputmode='tel' value=sessionAccount.currentUser.phone
       .form-field.required
         label Email Address
         = input type='email' autocapitalize='off' autocorrect='off' autocomplete='email' name='email' placeholder='john.doe@gmail.com' required=true inputmode='email' value=sessionAccount.currentUser.email
