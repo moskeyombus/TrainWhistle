@@ -45,7 +45,8 @@ defmodule TrainWhistle.Mixfile do
      {:cowboy, "~> 1.0"},
      {:quantum, "~> 1.8.0"},
      {:guardian, "~> 0.13.0"},
-     {:comeonin, "~> 2.5"}]
+     {:comeonin, "~> 2.5"},
+     {:ja_serializer, "~> 0.11.1"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

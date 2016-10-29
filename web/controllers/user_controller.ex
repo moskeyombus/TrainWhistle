@@ -35,9 +35,16 @@ defmodule TrainWhistle.UserController do
     end
   end
 
-  def me(conn, _) do
+  def index(conn, params) do
     user = Guardian.Plug.current_resource(conn)
-    conn |> render("show.json", user: user)
+
+    if params["me"] == "true" do
+      render conn, data: user
+    else
+      conn
+      |> put_status(:unprocessable_entity)
+      |> json(%{message: "Hello Mr. Kitty"})
+    end
   end
 
   def unauthenticated(conn, _) do

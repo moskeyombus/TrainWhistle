@@ -19,7 +19,9 @@ defmodule TrainWhistle.User do
   returning the user entity if successful
   """
   def authenticate(params) do
-    user = Repo.get_by(__MODULE__, email: params["email"])
+
+    # Opt for using username here since it's what the OAuth standard asks for.
+    user = Repo.get_by(__MODULE__, email: params["username"])
     case check_pw(user, params["password"]) do
       true -> {:ok, user}
       _    -> :error

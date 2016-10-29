@@ -1,6 +1,9 @@
 defmodule TrainWhistle.UserView do
   use TrainWhistle.Web, :view
+  use JaSerializer.PhoenixView
+
   @attributes ~w(id email phone)a
+  attributes [:id, :email, :phone]
 
   def render("show.json", %{user: user}) do
     render_user(user)
@@ -8,7 +11,7 @@ defmodule TrainWhistle.UserView do
 
   def render("login.json", %{user: user, jwt: jwt, exp: exp}) do
     %{user: render_user(user),
-      token: jwt,
+      access_token: jwt,
       exp: exp}
   end
 

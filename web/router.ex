@@ -10,7 +10,7 @@ defmodule TrainWhistle.Router do
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug :accepts, ["json", "json-api"]
     plug Guardian.Plug.VerifyHeader, realm: "Bearer"
     plug Guardian.Plug.LoadResource
   end
@@ -37,7 +37,7 @@ defmodule TrainWhistle.Router do
     scope as: :private do
       pipe_through :authenticated
 
-      get "/me", UserController, :me
+      get "/users", UserController, :index
     end
   end
 end

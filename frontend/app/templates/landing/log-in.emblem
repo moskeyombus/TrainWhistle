@@ -7,13 +7,18 @@
     b sign up 
     | to start to set up your Atlanta transit alerts and stop being late to work.
 hr.spacer
-form
+form submit="authenticate"
+  if errorMessage
+    p.text-center.text-danger
+      b Oops! 
+      = errorMessage
+    hr.spacer
   .form-field
     label Email Address
-    input placeholder='john.doe@example.com' type='email'
+    = input placeholder='john.doe@example.com' name='email' type='email' value=email required=true autocapitalize='off' autocorrect='off' autocomplete='email' required=true inputmode='email'
   .form-field
     label Password
-    input placeholder='password' type='password'
+    = input placeholder='password' type='password' value=password required=true
   .buttons-row
     = link-to 'landing.sign-up' class='btn btn-ghost-default' | Sign Up
     button.btn.btn-success.btn-main type='submit' Log In

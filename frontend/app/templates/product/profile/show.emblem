@@ -9,24 +9,24 @@
           .label
             i.fa.fa-user
             | Name
-          if model.user.name
-            .value= model.user.name
+          if sessionAccount.currentUser.name
+            .value= sessionAccount.currentUser.name
           else
             = missing-field field='Name' location='product.profile.edit'
         li
           .label
             i.fa.fa-envelope-o
             | Email Address
-          if model.user.email
-            .value= model.user.email
+          if sessionAccount.currentUser.email
+            .value= sessionAccount.currentUser.email
           else
             = missing-field field='Email' location='product.profile.edit'
         li
           .label
             i.fa.fa-phone
             | Phone Number
-          if model.user.phone
-            .value= model.user.phone
+          if sessionAccount.currentUser.phone
+            .value= sessionAccount.currentUser.phone
           else
             = missing-field field='Phone' location='product.profile.edit'
     hr.spacer

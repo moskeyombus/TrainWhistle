@@ -13,6 +13,10 @@ App = Ember.Application.extend({
   Resolver
 });
 
+Ember.TextSupport.reopen({
+  attributeBindings: ["autocapitalize"]
+});
+
 loadInitializers(App, config.modulePrefix);
 
 export default App;

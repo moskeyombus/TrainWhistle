@@ -3,26 +3,26 @@
 .text-center
   small We help you know when you need to leave to get to your train or bus at the right moment for you to get to work on time, stress-free.
 hr.spacer
-form
+form submit='register'
   .fields-row
     .form-field
       label First Name
-      input placeholder='John' type='text' name='first_name' autocapitalize='words' autocorrect='off' autocomplete='given-name' inputmode='latin-name'
+      = input placeholder='John' type='text' name='first_name' autocapitalize='words' autocorrect='off' autocomplete='given-name' inputmode='latin-name' value=firstName
     .form-field
       label Last Name
-      input placeholder='Doe' type='text' name='last_name' autocapitalize='words' autocorrect='off' autocomplete='family-name' inputmode='latin-name'
-  .form-field.top-layer
+      = input placeholder='Doe' type='text' name='last_name' autocapitalize='words' autocorrect='off' autocomplete='family-name' inputmode='latin-name' value=lastName
+  .form-field.top-layer.required
     label Phone Number
-    = intl-tel-input type='tel' autocapitalize='none' autocorrect='on' autocomplete='tel' name='phone' placeholder='+1 (555) 555-555' inputmode='tel'
+    = intl-tel-input type='tel' autocapitalize='none' autocorrect='on' autocomplete='tel' name='phone' placeholder='+1 (555) 555-555' inputmode='tel' required=true number=phone
   .form-field.required
     label Email Address
-    input placeholder='john.doe@example.com' type='email' name='email' autocapitalize='off' autocorrect='off' autocomplete='email' required=true inputmode='email'
+    = input placeholder='john.doe@example.com' type='email' name='email' autocapitalize='off' autocorrect='off' autocomplete='email' required=true inputmode='email' value=email
   .form-field.required
     label Password
-    input placeholder='password' type='password' name='password' required=true
-  .form-field
+    = input placeholder='password' type='password' name='password' required=true value=password
+  .form-field.required
     label Confirm Password
-    input placeholder='password' type='password' name='password_confirmation'
+    = input placeholder='password' type='password' name='password_confirmation' required=true value=passwordConfirmation
   .buttons-row
     = link-to 'landing.log-in' class='btn btn-ghost-default' | Log In
     button.btn.btn-success.btn-main type='submit' Sign Up
