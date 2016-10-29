@@ -2372,7 +2372,7 @@ define('trainwhistle/utils/titleize', ['exports', 'ember-composable-helpers/util
 /* jshint ignore:start */
 
 define('trainwhistle/config/environment', ['ember'], function(Ember) {
-  var exports = {'default': {"modulePrefix":"trainwhistle","environment":"development","rootURL":"/","locationType":"auto","EmberENV":{"FEATURES":{}},"APP":{"name":"trainwhistle","version":"0.0.0+40866f12"},"ember-cli-post-build-copy":{"replace":true,"verbose":false,"development":[["/assets/vendor.js","../web/static/vendor/vendor.js"],["/assets/trainwhistle.js","../web/static/vendor/trainwhistle.js"],["/assets/vendor.css","../web/static/css/vendor.css"],["/assets/trainwhistle.css","../web/static/css/trainwhistle.css"],["/images/city-poster.jpg","../web/static/assets/images/city-poster.jpg"],["/images/favicon.png","../web/static/assets/images/favicon.png"],["/images/logo-color.svg","../web/static/assets/images/logo-color.svg"],["/images/logo-icon-white.svg","../web/static/assets/images/logo-icon-white.svg"],["/images/logo.svg","../web/static/assets/images/logo.svg"],["/videos/city.mp4","../web/static/assets/videos/city.mp4"]]},"exportApplicationGlobal":true}};Object.defineProperty(exports, '__esModule', {value: true});return exports;
+  var exports = {'default': {"modulePrefix":"trainwhistle","environment":"development","rootURL":"/","locationType":"auto","EmberENV":{"FEATURES":{}},"APP":{"name":"trainwhistle","version":"0.0.0+04aa2e5e"},"ember-cli-post-build-copy":{"replace":true,"verbose":false,"development":[["/assets/vendor.js","../web/static/vendor/vendor.js"],["/assets/trainwhistle.js","../web/static/vendor/trainwhistle.js"],["/assets/vendor.css","../web/static/css/vendor.css"],["/assets/trainwhistle.css","../web/static/css/trainwhistle.css"],["/images/city-poster.jpg","../web/static/assets/images/city-poster.jpg"],["/images/favicon.png","../web/static/assets/images/favicon.png"],["/images/logo-color.svg","../web/static/assets/images/logo-color.svg"],["/images/logo-icon-white.svg","../web/static/assets/images/logo-icon-white.svg"],["/images/logo.svg","../web/static/assets/images/logo.svg"],["/videos/city.mp4","../web/static/assets/videos/city.mp4"]]},"exportApplicationGlobal":true}};Object.defineProperty(exports, '__esModule', {value: true});return exports;
 });
 
 /* jshint ignore:end */
@@ -2380,7 +2380,7 @@ define('trainwhistle/config/environment', ['ember'], function(Ember) {
 /* jshint ignore:start */
 
 if (!runningTests) {
-  require("trainwhistle/app")["default"].create({"name":"trainwhistle","version":"0.0.0+40866f12"});
+  require("trainwhistle/app")["default"].create({"name":"trainwhistle","version":"0.0.0+04aa2e5e"});
 }
 
 /* jshint ignore:end */

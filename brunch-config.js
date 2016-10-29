@@ -59,11 +59,11 @@ exports.config = {
     }
   },
 
-  modules: {
-    autoRequire: {
-      "js/app.js": ["web/static/js/app"]
-    }
-  },
+  // modules: {
+  //   autoRequire: {
+  //     "js/app.js": ["web/static/js/app"]
+  //   }
+  // },
 
   npm: {
     enabled: true
