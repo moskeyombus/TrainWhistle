@@ -11,6 +11,12 @@ defmodule TrainWhistle.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
+    plug Guardian.Plug.LoadResource
+  end
+
+  pipeline :authenticated do
+    plug Guardian.Plug.EnsureAuthenticated, handler: TrainWhistle.UserController
   end
 
   scope "/", TrainWhistle do
@@ -20,7 +26,18 @@ defmodule TrainWhistle.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", TrainWhistle do
-  #   pipe_through :api
-  # end
+  scope "/api", TrainWhistle do
+    pipe_through :api
+
+    scope as: :public do
+      post "/users", UserController, :create
+      post "/login", UserController, :login
+    end
+
+    scope as: :private do
+      pipe_through :authenticated
+
+      get "/me", UserController, :me
+    end
+  end
 end

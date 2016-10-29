@@ -36,9 +36,10 @@ defmodule TrainWhistle.User do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:email, :phone])
-    |> validate_required([:email])
+    |> validate_required([:email, :phone])
     |> validate_length(:email, min: 3, max: 255)
     |> validate_format(:email, ~r/@/, message: "not a valid email.")
+    |> unique_constraint(:email)
   end
 
   @doc """
@@ -48,6 +49,7 @@ defmodule TrainWhistle.User do
     struct
     |> changeset(params)
     |> cast(params, [:password])
+    |> validate_required(:password)
     |> validate_length(:password, min: 6, message: "password must be at least 6 characters.")
     |> hash_password
   end
