@@ -4,6 +4,7 @@
     "ember": "~2.8.0",
     "ember-cli-shims": "0.1.1",
     "closest": "~2.0.1",
+    "jquery": "1.11.3",
     "better-dateinput-polyfill": "~2.0.0",
     "intl-tel-input": "~6.0.3",
     "pikaday": "^1.4.0",

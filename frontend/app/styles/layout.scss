@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+}
+
+.content-dialog {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  min-width: 100vw;
+}
+
+.dialog-box {
+  background: #fff;
+  border-radius: 5px;
+  margin: 7.5%;
+  max-width: 600px;
+  padding: 2.5%;
+  width: 100%;
+}

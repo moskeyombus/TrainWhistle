@@ -1,0 +1,80 @@
+button.btn, a.btn, .btn {
+  @include no-decoration();
+
+  background: none;
+  border-image: none;
+  border-radius: 0;
+  border-style: solid;
+  cursor: pointer;
+  display: inline-block;
+  font-family: $header-fonts;
+  font-size: 1em;
+  letter-spacing: 2.5px;
+  outline: none;
+  padding: 0.75em 1em;
+  text-align: center;
+  text-transform: uppercase;
+  transition: all 0.4s ease;
+
+  &.disabled, &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  &.btn-sm {
+    padding: .625em 0.85em;
+    font-size: .85em;
+  }
+
+  &.btn-lg {
+    padding: 1.125em 1.5em;
+    font-size: 1.25em;
+  }
+}
+
+.buttons-row {
+  @include flex(row, wrap, center, center);
+
+  &.buttons-left {
+    justify-content: flex-start;
+  }
+
+  &.buttons-right {
+    justify-content: flex-end;
+  }
+
+  &.buttons-spaced {
+    justify-content: space-around;
+  }
+
+  button, a {
+    flex: 1 1 auto;
+    margin: 0 7.5px;
+  }
+
+  .btn-main {
+    flex: 2 1 auto;
+  }
+
+  @media (max-width: $screen-xs-max) {
+    button, a {
+      margin: 7.5px;
+      order: 2;
+      width: 100%;
+    }
+
+    .btn-main {
+      order: 1;
+    }
+  }
+}
+
+@each $name, $color in $brand-colors {
+  @include button($name, $color);
+}
+
+// Social Network Buttons
+@each $profile in $social-profiles {
+  $color: map-get($social-colors, $profile);
+  @include button($profile, $color);
+}

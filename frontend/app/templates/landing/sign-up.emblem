@@ -1,0 +1,25 @@
+.image-box
+  img src='/images/logo-color.svg' width=400
+.text-center
+  small We help you know when you need to leave to get to your train or bus at the right moment for you to get to work on time, stress-free.
+hr.spacer
+form
+  .fields-row
+    .form-field
+      label First Name
+      input placeholder='John' type='text' name='first_name' autocapitalize='words' autocorrect='off' autocomplete='given-name' inputmode='latin-name'
+    .form-field
+      label Last Name
+      input placeholder='Doe' type='text' name='last_name' autocapitalize='words' autocorrect='off' autocomplete='family-name' inputmode='latin-name'
+  .form-field
+    label Email Address
+    input placeholder='john.doe@example.com' type='email' name='email' autocapitalize='off' autocorrect='off' autocomplete='email' required=true inputmode='email'
+  .form-field
+    label Password
+    input placeholder='password' type='password' name='password'
+  .form-field
+    label Confirm Password
+    input placeholder='password' type='password' name='password_confirmation'
+  .buttons-row
+    = link-to 'landing.log-in' class='btn btn-ghost-default' | Log In
+    button.btn.btn-success.btn-main type='submit' Sign Up
