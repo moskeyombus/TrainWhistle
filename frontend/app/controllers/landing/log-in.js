@@ -15,7 +15,7 @@ export default Ember.Controller.extend({
       .authenticate('authenticator:oauth2', email, password)
       .then(() => {
         this.get('sessionAccount').loadCurrentUser();
-      }).catch((reason) => {
+      }).catch(() => {
         this.set('errorMessage', 'Invalid username or password');
       });
     }
