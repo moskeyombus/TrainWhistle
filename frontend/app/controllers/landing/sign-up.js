@@ -15,11 +15,13 @@ export default Ember.Controller.extend({
       }
 
       let userData = {
-        first_name: this.get('firstName'),
-        last_name: this.get('lastName'),
-        email: this.get('email'),
-        password: this.get('password'),
-        phone: this.get('phone')
+        user: {
+          first_name: this.get('firstName'),
+          last_name: this.get('lastName'),
+          email: this.get('email'),
+          password: this.get('password'),
+          phone: this.get('phone')
+        }
       };
 
       this.get('ajax').post('/api/users', { data: userData })
