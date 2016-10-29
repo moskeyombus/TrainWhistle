@@ -11,8 +11,6 @@ config :train_whistle, TrainWhistle.Repo,
 
 # Configure ExTwilio
 config :ex_twilio,
-  account_sid: ""
-  auth_token:  ""
-
-config :train_whistle, TrainWhistle,
+  account_sid: "",
+  auth_token:  "",
   twilio_number: ""

@@ -21,6 +21,12 @@ config :train_whistle, TrainWhistle.Repo,
 config :guardian, Guardian,
   secret_key: "somuchverysecretkeywow"
 
+# Configure ExTwilio
+config :ex_twilio,
+  account_sid: "",
+  auth_token:  "",
+  twilio_number: ""
+
 if File.exists? "config/test.secret.exs" do
   import_config "test.secret.exs"
 end

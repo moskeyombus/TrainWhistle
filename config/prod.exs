@@ -29,6 +29,12 @@ config :train_whistle, TrainWhistle.Repo,
 # Do not print debug messages in production
 config :logger, level: :info
 
+# Configure ExTwilio
+config :ex_twilio,
+  account_sid: System.get_env("TWILIO_ACCOUNT_SID"),
+  auth_token:  System.get_env("TWILIO_AUTH_TOKEN"),
+  twilio_number: System.get_env("TWILIO_NUMBER")
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

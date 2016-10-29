@@ -4,7 +4,7 @@ defmodule TrainWhistle.Twilio do
   def send_message(to, message) do
     data = %{
       :to => to,
-      :from => Application.get_env(:train_whistle, TrainWhistle)[:twilio_number],
+      :from => Application.get_env(:ex_twilio, :twilio_number),
       :body => message}
     ExTwilio.Message.create(data)
   end
