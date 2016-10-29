@@ -15,6 +15,8 @@ defmodule TrainWhistle.AlarmView do
       end_time: alarm.end_time,
       travel_time: alarm.travel_time,
       last_notified: alarm.last_notified,
-      start_location_id: alarm.start_location_id}
+      start_location_id: alarm.start_location_id,
+      name: alarm.name
+    }
   end
 end

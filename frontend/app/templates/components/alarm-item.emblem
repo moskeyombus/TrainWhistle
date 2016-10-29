@@ -9,20 +9,31 @@ if inEditMode
     .form-field
       label End Time
       = input type='time' value=alarm.end_time
+  .fields-row
+    .form-field
+      label Line
+      = power-select-with-fallback options=lines verticalPosition='below' selected=alarm.line allowClear=false placeholder='Select a line' required=true onchange=(action (mut alarm.line)) as |line|
+        span.capitalize= line
+    .form-field
+      label Direction
+      = power-select-with-fallback options=directions verticalPosition='below' selected=alarm.direction allowClear=false placeholder='Select a direction' required=true onchange=(action (mut alarm.direction)) as |direction|
+        span.capitalize= direction
   .buttons-row
     button.btn.btn-ghost-default.btn-sm click='show' Cancel
     button.btn.btn-success.btn-sm click='save' Save Alarm
 else
   h3
     | Morning Wake Up Call - 
-    span.text-danger Red Line
+    span.text-danger.capitalize
+      = alarm.line
+      | Line
     | , Five Points
   .time-info
     i.fa.fa-clock-o &nbsp; 
-    | Get on train between 9:00am and 9:30am
-    | &nbsp; | &nbsp;
-    i.fa.fa-calendar &nbsp; 
-    | M, W, F
+    | Get on train between 
+    = alarm.humanStartTime 
+    |  and 
+    = alarm.humanEndTime
     a.pull-right click='edit'
       i.fa.fa-pencil &nbsp;
       | Edit

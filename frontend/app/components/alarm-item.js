@@ -18,5 +18,7 @@ export default Ember.Component.extend({
   inEditMode: Ember.computed('mode', function() {
     return 'edit' === this.get('mode');
   }),
+  directions: ['n', 's', 'e', 'w'],
+  lines: ['blue', 'gold', 'green', 'red'],
   mode: 'show'
 });
