@@ -3,6 +3,8 @@ defmodule TrainWhistle.Location do
 
   schema "locations" do
     field :name, :string
+    field :lat, :float
+    field :long, :float
 
     timestamps()
   end

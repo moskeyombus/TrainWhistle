@@ -4,7 +4,7 @@ defmodule TrainWhistle.TestHelper do
 
   def auth_setup(conn) do
     {:ok, user} = create_user
-    {:ok, jwt, full_claims} = Guardian.encode_and_sign(user)
+    {:ok, jwt, _full_claims} = Guardian.encode_and_sign(user)
     new_conn = conn
     |> Plug.Conn.put_req_header("accept", "application/json")
     |> Plug.Conn.put_req_header("authorization", "Bearer #{jwt}")
