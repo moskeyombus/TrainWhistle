@@ -1,0 +1,16 @@
+.video-underlay {
+  background: #000;
+  bottom: 0;
+  display: block;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: -1;
+
+  video {
+    min-height: 100vh;
+    opacity: 0.85;
+    width: 100vw;
+  }
+}

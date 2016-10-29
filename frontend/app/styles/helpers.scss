@@ -1,0 +1,109 @@
+// Mixins And Utility Classes
+
+.align-right {
+  margin-left: auto;
+}
+
+.align-left {
+  margin-right: auto;
+}
+
+@mixin button($name, $color, $text-color: #fff) {
+  $hover-color: darken($color, 10%);
+  $active-color: darken($color, 20%);
+
+  button.btn.btn-#{$name}, a.btn.btn-#{$name}, .btn.btn-#{$name} {
+    background: $color;
+    border: 1px solid $color;
+    color: $text-color;
+    cursor: pointer;
+
+    &:hover {
+      background: $hover-color;
+    }
+
+    &:active {
+      background: $active-color;
+    }
+  }
+
+  button.btn.btn-ghost-#{$name}, a.btn.btn-ghost-#{$name}, .btn.btn-ghost-#{$name} {
+    background: transparent;
+    border: 1px solid $color;
+    color: $color;
+    cursor: pointer;
+
+    &:hover {
+      background: $color;
+      color: $text-color;
+    }
+
+    &:active {
+      background: $active-color;
+      color: $text-color;
+    }
+  }
+}
+
+@mixin flex($layout:row, $wrap:nowrap, $alignment:center, $justification:center) {
+  align-items: $alignment;
+  display: flex;
+  flex-flow: $layout $wrap;
+  justify-content: $justification;
+}
+
+@mixin no-decoration() {
+  &, &:hover, &:active, &:focus {
+    text-decoration: none;
+  }
+}
+
+
+@mixin link-root($color, $no-decoration:true) {
+  color: $color;
+  transition: color 0.25s ease;
+
+  &:hover {
+    color: darken($color, 25%);
+  }
+
+  &:active, &:focus {
+    color: darken($color, 50%);
+  }
+
+  @if ($no-decoration) {
+    @include no-decoration();
+  }
+}
+
+@mixin link($color, $no-decoration:true) {
+  a {
+    @include link-root($color, $no-decoration);
+  }
+}
+
+@media (min-width: $screen-sm-min) {
+  .visible-xs {
+    display: none;
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  .hidden-xs {
+    display: none !important;
+  }
+}
+
+@media (max-width: $screen-xx-max) {
+  .hidden-xx {
+    display: none !important;
+  }
+}
+
+.row {
+  @include flex(row, wrap, flex-start, flex-start);
+
+  .col {
+    flex: 1 1 (.9 * $screen-xx-max);
+  }
+}

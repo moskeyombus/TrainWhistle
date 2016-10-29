@@ -1,0 +1,87 @@
+// Reponsive Breakpoints
+$screen-xx-max: 450px;
+$screen-xs-min: $screen-xx-max + 1px;
+$screen-xs-max: 768px;
+$screen-sm-min: $screen-xs-max + 1px;
+$screen-sm-max: 1024px;
+$screen-md-min: $screen-sm-max + 1px;
+$screen-md-max: 1440px;
+$screen-lg-min: $screen-md-max + 1px;
+$screen-lg-max: 1980px;
+$screen-xl-min: $screen-lg-max + 1px;
+
+// Fonts
+
+$header-fonts: 'Raleway', 'Helvetica Neue', 'Helvetica', sans-serif;
+$body-fonts: 'Open Sans', sans-serif;
+
+// App Main Colors
+
+$brand-danger: #d9534f;
+$brand-info: #5bc0de;
+$brand-primary: #8D0000;
+$brand-success: #5cb85c;
+$brand-warning: #f0ad4e;
+
+// Layout Colors
+
+$main-bkg-color: #D8D8D8;
+$main-header-bkg-color: #fff;
+$main-header-text-color: #4A4A4A;
+$main-divider-color: darken($main-bkg-color, 15%);
+
+$alt-bkg-color: #F2F2F2;
+$alt-divider-color: $main-bkg-color;
+
+$muted-text-color: #9B9B9B;
+$text-muted: $muted-text-color; // Alias for uploader.scss
+
+// Nav Colors
+
+$nav-bkg-color: #222;
+$nav-text-color: #9B9B9B;
+$nav-text-active-color: #fff;
+
+// Social Profiles
+$social-profiles:
+  'facebook',
+  'google',
+  'hitbox',
+  'instagram',
+  'pinterest',
+  'steam',
+  'twitch',
+  'twitter',
+  'youtube';
+
+$social-colors: (
+  facebook: #435d96,
+  google: #d14836,
+  hitbox: #99cc00,
+  instagram: #4A8FFF,
+  pinterest: #c8232a,
+  steam: #111,
+  twitch: #6441a5,
+  twitter: #55acee,
+  youtube: #e62c22
+);
+
+$social-icons: (
+  facebook: '\f09a',
+  google: '\f1a0',
+  // hitbox: TBA,
+  instagram: '\f16d',
+  pinterest: '\f0d2',
+  steam: '\f1b6',
+  twitch: '\f1e8',
+  twitter: '\f099',
+  youtube: '\f167'
+);
+
+$brand-colors:
+  "danger" $brand-danger,
+  "default" $muted-text-color,
+  "info" $brand-info,
+  "primary" $brand-primary,
+  "success" $brand-success,
+  "warning" $brand-warning;

@@ -1,0 +1,321 @@
+.form-field {
+  @include flex(column, nowrap, stretch, flex-start);
+
+  flex: 2 0 250px;
+  margin: 5px 7.5px 25px;
+  max-width: 100%;
+  min-width: 150px;
+  position: relative;
+  z-index: 0;
+
+  &.narrow {
+    flex: 1 0 150px;
+  }
+
+  &.top-layer {
+    z-index: 1;
+  }
+
+  & > .checkbox {
+    margin-top: 0;
+  }
+
+  label {
+    color: #999;
+    font-family: $header-fonts;
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 5px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+
+    span.description {
+      font-size: 12px;
+      text-transform: lowercase;
+    }
+  }
+
+  &.required > label {
+    color: #666;
+    font-weight: 400;
+
+    &::after {
+      content: "(required)";
+      color: $brand-danger;
+      font-weight: 300;
+      margin-left: 5px;
+    }
+  }
+
+  &.optional > label::after {
+    content: "(optional)";
+    margin-left: 5px;
+  }
+
+  .input-wrapper {
+    @include flex(column, nowrap, stretch, flex-start);
+  }
+
+  input:not(.ember-power-select-trigger-multiple-input):not([type='file']), textarea:not(.ember-power-select-trigger-multiple-input) {
+    appearance: none;
+    border: 1px solid #999;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    font-family: $body-fonts;
+    font-size: 16px;
+    outline: none;
+    padding: 7.5px 12.5px;
+    transition: all 0.4s ease;
+
+    &:hover, &:focus {
+      border-color: $brand-primary;
+      box-shadow: none;
+      outline: none;
+    }
+
+    &:hover {
+      color: $brand-primary;
+    }
+
+    &:focus {
+      color: #000;
+    }
+  }
+
+  .intl-tel-input {
+    flex: 1 0 auto;
+
+    .flag-dropdown + input {
+      padding-left: 48px;
+      width: 100%;
+    }
+  }
+
+  & > select {
+    appearance: none;
+    background: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    height: 20px;
+    margin: 7.5px;
+    outline: 1px solid #999;
+    outline-offset: 7.5px;
+    transition: all 0.4s ease;
+
+    &:hover, &:focus {
+      box-shadow: none;
+      color: $brand-primary;
+      outline-color: $brand-primary;
+
+    }
+  }
+}
+
+.fields-row {
+  @include flex(row, wrap, flex-start, flex-start);
+}
+
+// Fix bad positioning by ember-wormhole
+.ember-basic-dropdown-content--above {
+  margin-top: 15px;
+}
+
+.ember-power-select-trigger {
+  border: 1px solid #999;
+  border-radius: 0;
+  box-shadow: none;
+  color: #333;
+  cursor: pointer;
+  font-size: 16px;
+  min-height: 20px;
+  outline: none;
+  padding: 7.5px 12.5px;
+  transition: all 0.4s ease;
+
+  &:hover, &:focus {
+    border-color: $brand-primary;
+    box-shadow: none;
+    outline: none;
+  }
+
+  &:hover {
+    color: $brand-primary;
+  }
+
+  &:focus {
+    color: #000;
+  }
+
+  .ember-power-select-selected-item, .ember-power-select-placeholder {
+    display: block;
+    line-height: 22px;
+    margin-left: 0;
+  }
+
+  .ember-power-select-clear-btn {
+    top: 2.5px;
+  }
+}
+
+.checkbox {
+  align-items: center;
+  align-self: stretch;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  margin: 15px 0 0;
+  position: relative;
+
+  label {
+    align-items: center;
+    display: flex;
+    flex: 1 0 auto;
+    margin-bottom: 0;
+  }
+
+  // Prevent browser's default checkboxes from showing
+  input[type=checkbox] {
+    display:none;
+  }
+
+  input[type=checkbox] + span::before {
+    content: "\f00c";
+    display: inline-block;
+    font-family: FontAwesome;
+  }
+
+  input[type=checkbox] + span {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #ccc;
+    color: #ccc;
+    cursor: pointer;
+    display: flex;
+    font-size: 20px;
+    min-height: 40px;
+    min-width: 40px;
+    justify-content: center;
+    transition: all 0.3s ease;
+    width: auto;
+
+    &:hover {
+    }
+  }
+
+  &.plus-box input[type=checkbox] + span::before {
+    content: "\f067";
+  }
+
+
+  input[type=checkbox]:checked + span {
+    background: $brand-primary;
+    border-color: $brand-primary;
+    color: #fff;
+    
+    &::before {
+      content: "\f00c";
+    }
+  }
+
+  &.green {
+    input[type=checkbox] + span {
+      border-color: $brand-success;
+      color: $brand-success;
+    }
+
+    input[type=checkbox]:checked + span {
+      background: $brand-success;
+      color: #fff;
+    }
+  }
+
+  &.flashing {
+    input[type=checkbox] + span {
+      animation-name: restingFlash;
+      animation-duration: 2s;
+      animation-play-state: running;
+      animation-fill-mode: both;
+      animation-iteration-count: infinite;  
+      box-shadow: none;
+    }
+
+    input[type=checkbox]:checked + span {
+      animation-name: none;
+    }
+  }
+
+  .cbox {
+    flex: 0 0 40px;
+  }
+
+  .text {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 14px;
+    padding: 0 10px;
+    text-align: left;
+  }
+}
+
+.uploader-context {
+  @include flex(row, nowrap, center, flex-start);
+  width: 100%;
+
+  .btn {
+    @media (max-width: $screen-xs-max) {
+      flex: 0 0 90px;
+    }
+  }
+}
+
+.progress {
+  border: 2px solid lighten($text-muted, 30%);
+  height: 20px;
+}
+
+.progress-bar {
+  background: $brand-primary;
+  background-size: 400% 400%;
+  height: 20px;
+  overflow: hidden;
+  position: relative;
+  transition: width 0.4s ease;
+
+  &.active::before {
+    animation: progressAnimation 1s ease-out infinite;
+    background: #fff;
+    bottom: 0;
+    content: '';
+    left: 0;
+    opacity: 0.35;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 20px;
+  }
+
+  &.done {
+    @include flex();
+
+    background: $brand-success;
+
+    &::before {
+      color: #fff;
+      content: 'Complete';
+      font-family: $header-fonts;
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+  }
+}
+
+@keyframes progressAnimation {
+  0%{
+    left: -20px;
+  },
+  100%{
+    left: calc(100% + 20px);
+  }
+}
