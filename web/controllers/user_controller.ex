@@ -2,7 +2,7 @@ defmodule TrainWhistle.UserController do
   use TrainWhistle.Web, :controller
   alias TrainWhistle.User
 
-  def create(conn, user_params) do
+  def create(conn, %{"user" => user_params}) do
     changeset = User.registration_changeset(%User{}, user_params)
 
     case Repo.insert(changeset) do
@@ -15,6 +15,11 @@ defmodule TrainWhistle.UserController do
         |> put_status(:unprocessable_entity)
         |> render(TrainWhistle.ChangesetView, "error.json", changeset: changeset)
     end
+  end
+
+  def me(conn, _params) do
+    user = Guardian.Plug.current_resource(conn)
+    conn |> render("show.json", user: user)
   end
 
   def login(conn, params) do
@@ -35,26 +40,12 @@ defmodule TrainWhistle.UserController do
     end
   end
 
-  def index(conn, params) do
+  def update(conn, %{"user" => params}) do
     user = Guardian.Plug.current_resource(conn)
-
-    if params["me"] == "true" do
-      render conn, data: user
-    else
-      conn
-      |> put_status(:unprocessable_entity)
-      |> json(%{message: "Hello Mr. Kitty"})
-    end
-  end
-
-  def update(conn, params) do
-    attrs = JaSerializer.Params.to_attributes(params)
-    user = Repo.get!(User, params["id"])
-    changeset = User.changeset(user, attrs)
-    IO.write changeset
+    changeset = User.changeset(user, params)
 
     case Repo.update(changeset) do
-      {:ok, post} ->
+      {:ok, user} ->
         render(conn, "show.json", user: user)
       {:error, changeset} ->
         conn

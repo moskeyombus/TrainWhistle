@@ -9,13 +9,13 @@ defmodule TrainWhistle.LocationControllerTest do
 
   test "lists all entries on index", %{conn: conn} do
     conn = get conn, private_location_path(conn, :index)
-    assert json_response(conn, 200) == []
+    assert json_response(conn, 200)["locations"]
   end
 
   test "shows chosen resource", %{conn: conn} do
     location = Repo.insert!(%Location{name: "myloc"})
     conn = get conn, private_location_path(conn, :show, location)
-    assert json_response(conn, 200) == %{"id" => location.id, "name" => location.name}
+    assert json_response(conn, 200)["location"] == %{"id" => location.id, "name" => location.name}
   end
 
   test "renders page not found when id is nonexistent", %{conn: conn} do

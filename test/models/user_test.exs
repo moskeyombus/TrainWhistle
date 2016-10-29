@@ -36,7 +36,7 @@ defmodule TrainWhistle.UserTest do
       %User{email: "coolio", password_hash: hash}
     )
     {:ok, authenticated} = User.authenticate(
-      %{"email" => "coolio", "password" => "pass"}
+      %{"username" => "coolio", "password" => "pass"}
     )
 
     assert user == authenticated

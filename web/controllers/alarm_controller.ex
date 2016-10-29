@@ -10,7 +10,7 @@ defmodule TrainWhistle.AlarmController do
     render(conn, "index.json", alarms: user.alarms)
   end
 
-  def create(conn, alarm_params) do
+  def create(conn, %{"alarm" => alarm_params}) do
     user = Guardian.Plug.current_resource(conn)
     changeset = Alarm.changeset %Alarm{}, Map.put(alarm_params, "user_id", user.id)
 
@@ -32,7 +32,7 @@ defmodule TrainWhistle.AlarmController do
     render(conn, "show.json", alarm: alarm)
   end
 
-  def update(conn, alarm_params = %{"id" => id}) do
+  def update(conn, %{"id" => id, "alarm" => alarm_params }) do
     user = Guardian.Plug.current_resource(conn)
     alarm = Repo.get_by!(Alarm, id: id, user_id: user.id)
     changeset = Alarm.changeset alarm, alarm_params
